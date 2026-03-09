@@ -1,0 +1,1975 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register — PeakFit Gym</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <style>
+      /* ═══════════════════════════════════════
+       VARIABLES — same as homepage
+    ═══════════════════════════════════════ */
+      :root {
+        --black: #08090b;
+        --dark: #0d0f13;
+        --dark2: #13161c;
+        --dark3: #191c24;
+        --dark4: #1f222c;
+        --gold: #c9922a;
+        --gold-lt: #e0a83a;
+        --gold-bright: #f0b429;
+        --gold-dim: rgba(201, 146, 42, 0.13);
+        --gold-glow: rgba(201, 146, 42, 0.28);
+        --teal: #1ec99a;
+        --teal-dim: rgba(30, 201, 154, 0.11);
+        --purple: #7c6af7;
+        --red: #e85555;
+        --red-dim: rgba(232, 85, 85, 0.12);
+        --white: #ffffff;
+        --w90: rgba(255, 255, 255, 0.9);
+        --w70: rgba(255, 255, 255, 0.7);
+        --w50: rgba(255, 255, 255, 0.5);
+        --w35: rgba(255, 255, 255, 0.35);
+        --w20: rgba(255, 255, 255, 0.2);
+        --w10: rgba(255, 255, 255, 0.1);
+        --w06: rgba(255, 255, 255, 0.06);
+        --w03: rgba(255, 255, 255, 0.03);
+        --border: rgba(255, 255, 255, 0.08);
+        --border-focus: rgba(201, 146, 42, 0.55);
+        --r-xs: 5px;
+        --r-sm: 9px;
+        --r-md: 14px;
+        --r-lg: 20px;
+        --r-xl: 28px;
+        --ff-display: "Cormorant Garamond", serif;
+        --ff-body: "DM Sans", sans-serif;
+        --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* ═══════════════════════════════════════
+       RESET
+    ═══════════════════════════════════════ */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: var(--ff-body);
+        background: var(--black);
+        color: var(--white);
+        min-height: 100vh;
+        overflow-x: hidden;
+        line-height: 1.65;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      /* Noise grain */
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 0.3;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      }
+
+      /* ═══════════════════════════════════════
+       ANIMATIONS
+    ═══════════════════════════════════════ */
+      @keyframes fade-up {
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+      @keyframes float-b {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-14px);
+        }
+      }
+      @keyframes lift {
+        0%,
+        100% {
+          transform: translateY(0) rotate(-3deg);
+        }
+        45% {
+          transform: translateY(-18px) rotate(3deg);
+        }
+      }
+      @keyframes pulse-glow {
+        0%,
+        100% {
+          opacity: 0.3;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.7;
+          transform: scale(1.08);
+        }
+      }
+      @keyframes spin-slow {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes orb-drift {
+        from {
+          transform: translate(0, 0);
+        }
+        to {
+          transform: translate(18px, 14px);
+        }
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.2;
+        }
+      }
+      @keyframes slide-in {
+        from {
+          opacity: 0;
+          transform: translateX(-12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      @keyframes scale-in {
+        from {
+          opacity: 0;
+          transform: scale(0.92);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      @keyframes step-fill {
+        from {
+          width: 0;
+        }
+        to {
+          width: 100%;
+        }
+      }
+      @keyframes check-pop {
+        0% {
+          transform: scale(0);
+        }
+        60% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      @keyframes heartbeat {
+        0%,
+        100% {
+          transform: scaleX(1);
+        }
+        50% {
+          transform: scaleX(1.04);
+        }
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: -400px 0;
+        }
+        100% {
+          background-position: 400px 0;
+        }
+      }
+
+      .fu {
+        animation: fade-up 0.7s var(--ease) both;
+      }
+      .fu-1 {
+        animation: fade-up 0.7s var(--ease) 0.08s both;
+      }
+      .fu-2 {
+        animation: fade-up 0.7s var(--ease) 0.16s both;
+      }
+      .fu-3 {
+        animation: fade-up 0.7s var(--ease) 0.24s both;
+      }
+      .fu-4 {
+        animation: fade-up 0.7s var(--ease) 0.32s both;
+      }
+      .fu-5 {
+        animation: fade-up 0.7s var(--ease) 0.4s both;
+      }
+      .fu-6 {
+        animation: fade-up 0.7s var(--ease) 0.48s both;
+      }
+      .fi {
+        animation: fade-in 1.1s var(--ease) 0.05s both;
+      }
+
+      /* ═══════════════════════════════════════
+       PAGE LAYOUT — two columns
+    ═══════════════════════════════════════ */
+      .page-wrap {
+        display: grid;
+        grid-template-columns: 1fr 1.1fr;
+        min-height: 100vh;
+      }
+
+      /* ═══════════════════════════════════════
+       LEFT PANEL — Branding / Visual
+    ═══════════════════════════════════════ */
+      .left-panel {
+        background: var(--dark);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        padding: 36px 48px 40px;
+        min-height: 100vh;
+      }
+
+      /* grid lines */
+      .left-panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.018) 1px,
+            transparent 1px
+          );
+        background-size: 64px 64px;
+        mask-image: radial-gradient(
+          ellipse 85% 85% at 50% 50%,
+          black 20%,
+          transparent 100%
+        );
+      }
+
+      /* Ambient orbs */
+      .lp-orb {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        filter: blur(72px);
+      }
+      .lp-orb-1 {
+        width: 480px;
+        height: 480px;
+        background: radial-gradient(
+          circle,
+          rgba(201, 146, 42, 0.16) 0%,
+          transparent 68%
+        );
+        top: -160px;
+        right: -120px;
+        animation: orb-drift 11s ease-in-out infinite alternate;
+      }
+      .lp-orb-2 {
+        width: 320px;
+        height: 320px;
+        background: radial-gradient(
+          circle,
+          rgba(30, 201, 154, 0.08) 0%,
+          transparent 68%
+        );
+        bottom: -80px;
+        left: -60px;
+      }
+
+      /* Logo */
+      .lp-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        z-index: 2;
+        flex-shrink: 0;
+      }
+      .lp-logo-mark {
+        width: 38px;
+        height: 38px;
+        background: var(--gold);
+        border-radius: var(--r-xs);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+        color: #fff;
+      }
+      .lp-logo-text {
+        font-family: var(--ff-display);
+        font-size: 21px;
+        font-weight: 600;
+        color: var(--white);
+      }
+      .lp-logo-text span {
+        font-style: italic;
+        color: var(--gold-bright);
+      }
+      .lp-logo-sub {
+        font-size: 10px;
+        color: var(--w35);
+        letter-spacing: 1.1px;
+        text-transform: uppercase;
+        margin-top: 1px;
+      }
+
+      /* Main visual area */
+      .lp-visual {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 2;
+        padding: 40px 0 20px;
+      }
+
+      /* ── GYM SCENE ── */
+      .gym-scene {
+        position: relative;
+        width: 340px;
+        height: 340px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 36px;
+      }
+      .g-ring {
+        position: absolute;
+        border-radius: 50%;
+        border: 1px solid rgba(201, 146, 42, 0.1);
+      }
+      .g-ring-1 {
+        width: 320px;
+        height: 320px;
+      }
+      .g-ring-2 {
+        width: 250px;
+        height: 250px;
+        border-color: rgba(201, 146, 42, 0.07);
+      }
+      .g-ring-3 {
+        width: 180px;
+        height: 180px;
+        border: 1px dashed rgba(201, 146, 42, 0.12);
+        animation: spin-slow 28s linear infinite;
+      }
+      .g-glow {
+        position: absolute;
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(201, 146, 42, 0.22) 0%,
+          transparent 70%
+        );
+        animation: pulse-glow 3.5s ease-in-out infinite;
+      }
+      .dumbbell-wrap {
+        position: relative;
+        animation: lift 4s ease-in-out infinite;
+        z-index: 5;
+      }
+      .dumbbell-svg {
+        width: 180px;
+        height: auto;
+        filter: drop-shadow(0 8px 28px rgba(201, 146, 42, 0.4));
+      }
+
+      /* Floating mini-cards */
+      .lp-fc {
+        position: absolute;
+        z-index: 10;
+        background: rgba(19, 22, 28, 0.92);
+        border: 1px solid var(--border);
+        border-radius: var(--r-md);
+        padding: 12px 16px;
+        backdrop-filter: blur(16px);
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+      }
+      .lp-fc-label {
+        font-size: 9.5px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.9px;
+        color: var(--w35);
+        margin-bottom: 3px;
+      }
+      .lp-fc-val {
+        font-family: var(--ff-display);
+        font-size: 22px;
+        font-weight: 600;
+        line-height: 1;
+      }
+      .lp-fc-sub {
+        font-size: 10.5px;
+        color: var(--w35);
+        margin-top: 3px;
+      }
+      .fc-tl {
+        top: 20px;
+        left: 0px;
+        animation: float 4.5s ease-in-out infinite;
+      }
+      .fc-bl {
+        bottom: 40px;
+        left: -10px;
+        animation: float-b 5.5s ease-in-out 0.8s infinite;
+      }
+      .fc-tr {
+        top: 40px;
+        right: 0px;
+        animation: float 4s ease-in-out 0.4s infinite;
+      }
+      .hb-line {
+        margin-top: 6px;
+        animation: heartbeat 1.3s ease-in-out infinite;
+      }
+
+      /* Branding text below scene */
+      .lp-headline {
+        font-family: var(--ff-display);
+        font-size: 34px;
+        font-weight: 600;
+        color: var(--white);
+        line-height: 1.12;
+        text-align: center;
+        letter-spacing: -0.3px;
+        margin-bottom: 14px;
+      }
+      .lp-headline em {
+        font-style: italic;
+        color: var(--gold-bright);
+      }
+      .lp-sub {
+        font-size: 14px;
+        color: var(--w50);
+        text-align: center;
+        line-height: 1.75;
+        max-width: 340px;
+      }
+
+      /* Benefits list at bottom */
+      .lp-benefits {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding-top: 28px;
+        border-top: 1px solid var(--border);
+      }
+      .lp-benefit {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+        color: var(--w55);
+      }
+      .lp-benefit-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: var(--gold-dim);
+        color: var(--gold-bright);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        flex-shrink: 0;
+      }
+
+      /* ═══════════════════════════════════════
+       RIGHT PANEL — Form
+    ═══════════════════════════════════════ */
+      .right-panel {
+        background: var(--black);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 60px;
+        position: relative;
+        overflow-y: auto;
+      }
+
+      .form-wrap {
+        width: 100%;
+        max-width: 500px;
+      }
+
+      /* ── STEP PROGRESS BAR ── */
+      .step-progress {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        margin-bottom: 36px;
+      }
+      .step-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        position: relative;
+      }
+      .step-item:last-child {
+        flex: none;
+      }
+      .step-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1.5px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--w35);
+        background: var(--dark2);
+        flex-shrink: 0;
+        transition: all 0.3s var(--ease);
+        position: relative;
+        z-index: 2;
+      }
+      .step-circle.active {
+        border-color: var(--gold);
+        color: var(--gold);
+        background: var(--gold-dim);
+        box-shadow: 0 0 0 4px rgba(201, 146, 42, 0.12);
+      }
+      .step-circle.done {
+        border-color: var(--teal);
+        background: var(--teal-dim);
+        color: var(--teal);
+      }
+      .step-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--w35);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        white-space: nowrap;
+      }
+      .step-label.active {
+        color: var(--gold);
+      }
+      .step-label.done {
+        color: var(--teal);
+      }
+      .step-line {
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+        margin: 0 10px;
+        position: relative;
+      }
+      .step-line::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 1px;
+        background: var(--gold);
+        width: 0%;
+        transition: width 0.5s var(--ease);
+      }
+      .step-line.done::after {
+        width: 100%;
+      }
+
+      /* ── FORM HEADER ── */
+      .form-header {
+        margin-bottom: 30px;
+      }
+      .form-eyebrow {
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 1.6px;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 10px;
+      }
+      .form-title {
+        font-family: var(--ff-display);
+        font-size: 36px;
+        font-weight: 600;
+        color: var(--white);
+        line-height: 1.1;
+        letter-spacing: -0.3px;
+        margin-bottom: 8px;
+      }
+      .form-title em {
+        font-style: italic;
+        color: var(--gold-bright);
+      }
+      .form-subtitle {
+        font-size: 14px;
+        color: var(--w50);
+        line-height: 1.65;
+      }
+
+      /* ── FORM STEPS (shown/hidden via JS) ── */
+      .form-step {
+        display: none;
+      }
+      .form-step.active {
+        display: block;
+        animation: scale-in 0.4s var(--ease) both;
+      }
+
+      /* ── FORM GROUPS ── */
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+      .form-group {
+        margin-bottom: 18px;
+      }
+      .form-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--w70);
+        margin-bottom: 7px;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+      }
+      .form-label .required {
+        color: var(--gold-bright);
+        margin-left: 3px;
+      }
+
+      /* Input wrapper for icon */
+      .input-wrap {
+        position: relative;
+      }
+      .input-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--w35);
+        font-size: 13.5px;
+        pointer-events: none;
+        transition: color 0.2s;
+      }
+      .input-wrap:focus-within .input-icon {
+        color: var(--gold-bright);
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px 14px 12px 42px;
+        background: var(--dark2);
+        border: 1.5px solid var(--border);
+        border-radius: var(--r-sm);
+        color: var(--w90);
+        font-family: var(--ff-body);
+        font-size: 14px;
+        outline: none;
+        transition: all 0.22s var(--ease);
+        appearance: none;
+        -webkit-appearance: none;
+      }
+      .form-control::placeholder {
+        color: var(--w35);
+      }
+      .form-control:focus {
+        border-color: var(--gold);
+        background: rgba(201, 146, 42, 0.04);
+        box-shadow: 0 0 0 3px rgba(201, 146, 42, 0.1);
+      }
+      .form-control.no-icon {
+        padding-left: 14px;
+      }
+      .form-control.error {
+        border-color: var(--red);
+        box-shadow: 0 0 0 3px var(--red-dim);
+      }
+      .form-control.success {
+        border-color: var(--teal);
+      }
+      select.form-control {
+        cursor: pointer;
+      }
+      select.form-control option {
+        background: var(--dark3);
+        color: var(--white);
+      }
+
+      /* Hint text below input */
+      .form-hint {
+        font-size: 11.5px;
+        color: var(--w35);
+        margin-top: 5px;
+      }
+      .form-error {
+        font-size: 11.5px;
+        color: var(--red);
+        margin-top: 5px;
+        display: none;
+      }
+      .form-error.visible {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      /* ── PASSWORD STRENGTH ── */
+      .pw-strength {
+        margin-top: 8px;
+      }
+      .pw-bars {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 5px;
+      }
+      .pw-bar {
+        flex: 1;
+        height: 3px;
+        border-radius: 2px;
+        background: var(--border);
+        transition: background 0.3s;
+      }
+      .pw-bar.weak {
+        background: var(--red);
+      }
+      .pw-bar.fair {
+        background: var(--gold);
+      }
+      .pw-bar.strong {
+        background: var(--teal);
+      }
+      .pw-label {
+        font-size: 11px;
+        color: var(--w35);
+      }
+      .pw-label.weak {
+        color: var(--red);
+      }
+      .pw-label.fair {
+        color: var(--gold);
+      }
+      .pw-label.strong {
+        color: var(--teal);
+      }
+
+      /* Show/hide password toggle */
+      .pw-toggle {
+        position: absolute;
+        right: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--w35);
+        font-size: 14px;
+        padding: 4px;
+        transition: color 0.2s;
+      }
+      .pw-toggle:hover {
+        color: var(--w70);
+      }
+
+      /* ── MEMBERSHIP PLAN SELECTOR ── */
+      .plan-selector {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .plan-option {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px;
+        background: var(--dark2);
+        border: 1.5px solid var(--border);
+        border-radius: var(--r-md);
+        cursor: pointer;
+        transition: all 0.22s var(--ease);
+        position: relative;
+      }
+      .plan-option:hover {
+        border-color: rgba(201, 146, 42, 0.3);
+        background: rgba(201, 146, 42, 0.04);
+      }
+      .plan-option.selected {
+        border-color: var(--gold);
+        background: rgba(201, 146, 42, 0.07);
+        box-shadow: 0 0 0 3px rgba(201, 146, 42, 0.1);
+      }
+      .plan-radio {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 1.5px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: all 0.2s;
+      }
+      .plan-option.selected .plan-radio {
+        border-color: var(--gold);
+        background: var(--gold);
+      }
+      .plan-option.selected .plan-radio::after {
+        content: "";
+        width: 7px;
+        height: 7px;
+        background: #000;
+        border-radius: 50%;
+        animation: check-pop 0.3s var(--ease) both;
+      }
+      .plan-info {
+        flex: 1;
+      }
+      .plan-name-text {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--white);
+        margin-bottom: 2px;
+      }
+      .plan-desc-text {
+        font-size: 12px;
+        color: var(--w50);
+      }
+      .plan-price-tag {
+        font-family: var(--ff-display);
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--gold-bright);
+      }
+      .plan-price-tag span {
+        font-size: 11px;
+        color: var(--w35);
+        font-family: var(--ff-body);
+        font-weight: 400;
+      }
+      .plan-badge {
+        position: absolute;
+        top: -8px;
+        right: 12px;
+        background: var(--gold);
+        color: #000;
+        font-size: 9px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 100px;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+      }
+
+      /* ── TERMS CHECKBOX ── */
+      .checkbox-group {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 14px 16px;
+        background: var(--dark2);
+        border: 1px solid var(--border);
+        border-radius: var(--r-md);
+        margin-bottom: 18px;
+        cursor: pointer;
+        transition: border-color 0.2s;
+      }
+      .checkbox-group:hover {
+        border-color: rgba(201, 146, 42, 0.25);
+      }
+      .checkbox-box {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        border: 1.5px solid var(--border);
+        background: var(--dark3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 1px;
+        transition: all 0.2s;
+      }
+      .checkbox-box.checked {
+        background: var(--gold);
+        border-color: var(--gold);
+      }
+      .checkbox-box.checked::after {
+        content: "\f00c";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        font-size: 10px;
+        color: #000;
+        animation: check-pop 0.25s var(--ease) both;
+      }
+      .checkbox-text {
+        font-size: 13px;
+        color: var(--w55);
+        line-height: 1.6;
+      }
+      .checkbox-text a {
+        color: var(--gold-bright);
+        font-weight: 500;
+      }
+      .checkbox-text a:hover {
+        text-decoration: underline;
+      }
+
+      /* ── SUBMIT BUTTON ── */
+      .btn-submit {
+        width: 100%;
+        padding: 14px 28px;
+        background: var(--gold);
+        color: #000;
+        border: none;
+        border-radius: var(--r-sm);
+        font-family: var(--ff-body);
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        letter-spacing: 0.4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.24s var(--ease);
+        position: relative;
+        overflow: hidden;
+      }
+      .btn-submit::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.12),
+          transparent
+        );
+        transform: translateX(-100%);
+        transition: transform 0.5s;
+      }
+      .btn-submit:hover {
+        background: var(--gold-lt);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 28px var(--gold-glow);
+      }
+      .btn-submit:hover::before {
+        transform: translateX(100%);
+      }
+      .btn-submit:active {
+        transform: translateY(0);
+      }
+
+      /* Step navigation */
+      .step-nav {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 6px;
+      }
+      .btn-next {
+        flex: 1;
+        padding: 13px 24px;
+        background: var(--gold);
+        color: #000;
+        border: none;
+        border-radius: var(--r-sm);
+        font-family: var(--ff-body);
+        font-size: 14.5px;
+        font-weight: 700;
+        cursor: pointer;
+        letter-spacing: 0.3px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        transition: all 0.24s var(--ease);
+      }
+      .btn-next:hover {
+        background: var(--gold-lt);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px var(--gold-glow);
+      }
+      .btn-back {
+        padding: 13px 20px;
+        background: transparent;
+        border: 1.5px solid var(--border);
+        border-radius: var(--r-sm);
+        color: var(--w50);
+        font-family: var(--ff-body);
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.22s var(--ease);
+      }
+      .btn-back:hover {
+        border-color: var(--w20);
+        color: var(--w70);
+        background: var(--w03);
+      }
+
+      /* ── DIVIDER ── */
+      .form-divider {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin: 20px 0;
+      }
+      .form-divider::before,
+      .form-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+      .form-divider span {
+        font-size: 12px;
+        color: var(--w35);
+        white-space: nowrap;
+      }
+
+      /* ── SIGN IN LINK ── */
+      .signin-link {
+        text-align: center;
+        font-size: 13.5px;
+        color: var(--w50);
+        margin-top: 20px;
+      }
+      .signin-link a {
+        color: var(--gold-bright);
+        font-weight: 600;
+      }
+      .signin-link a:hover {
+        text-decoration: underline;
+      }
+
+      /* ── SUCCESS STATE ── */
+      .success-state {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 20px 0;
+        animation: scale-in 0.5s var(--ease) both;
+      }
+      .success-state.visible {
+        display: flex;
+      }
+      .success-icon {
+        width: 80px;
+        height: 80px;
+        background: var(--teal-dim);
+        border: 2px solid var(--teal);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 34px;
+        color: var(--teal);
+        margin-bottom: 24px;
+        animation: check-pop 0.5s var(--ease) 0.2s both;
+      }
+      .success-title {
+        font-family: var(--ff-display);
+        font-size: 34px;
+        font-weight: 600;
+        color: var(--white);
+        margin-bottom: 10px;
+        letter-spacing: -0.2px;
+      }
+      .success-title em {
+        font-style: italic;
+        color: var(--teal);
+      }
+      .success-desc {
+        font-size: 14.5px;
+        color: var(--w55);
+        max-width: 360px;
+        line-height: 1.72;
+        margin-bottom: 32px;
+      }
+      .success-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+      }
+
+      /* ── BACK TO HOME LINK ── */
+      .back-home {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--w35);
+        margin-bottom: 32px;
+        transition: color 0.2s;
+        width: fit-content;
+      }
+      .back-home:hover {
+        color: var(--w70);
+      }
+      .back-home i {
+        font-size: 11px;
+      }
+
+      /* ── SECTION LABEL ── */
+      .section-label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: var(--w35);
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      /* ══════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════ */
+      @media (max-width: 1024px) {
+        .left-panel {
+          display: none;
+        }
+        .page-wrap {
+          grid-template-columns: 1fr;
+        }
+        .right-panel {
+          padding: 40px 32px;
+          justify-content: flex-start;
+          padding-top: 60px;
+        }
+        .form-wrap {
+          max-width: 100%;
+        }
+      }
+      @media (max-width: 540px) {
+        .right-panel {
+          padding: 32px 20px;
+        }
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-wrap">
+      <!-- ══════════════════════════════════════
+       LEFT PANEL
+  ══════════════════════════════════════ -->
+      <div class="left-panel">
+        <div class="lp-orb lp-orb-1"></div>
+        <div class="lp-orb lp-orb-2"></div>
+
+        <!-- Logo -->
+        <a href="index.html" class="lp-logo fi">
+          <div class="lp-logo-mark"><i class="fa-solid fa-dumbbell"></i></div>
+          <div>
+            <div class="lp-logo-text">Peak<span>Fit</span> Gym</div>
+            <div class="lp-logo-sub">Premium Fitness Center</div>
+          </div>
+        </a>
+
+        <!-- Visual -->
+        <div class="lp-visual fi">
+          <div class="gym-scene">
+            <div class="g-ring g-ring-1"></div>
+            <div class="g-ring g-ring-2"></div>
+            <div class="g-ring g-ring-3"></div>
+            <div class="g-glow"></div>
+
+            <!-- Dumbbell SVG -->
+            <div class="dumbbell-wrap">
+              <svg
+                class="dumbbell-svg"
+                viewBox="0 0 220 100"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x="60"
+                  y="45"
+                  width="100"
+                  height="10"
+                  rx="5"
+                  fill="url(#bG)"
+                />
+                <rect
+                  x="18"
+                  y="26"
+                  width="44"
+                  height="48"
+                  rx="8"
+                  fill="url(#pG)"
+                />
+                <rect
+                  x="26"
+                  y="33"
+                  width="28"
+                  height="34"
+                  rx="5"
+                  fill="url(#pI)"
+                />
+                <circle cx="40" cy="50" r="4.5" fill="#c9922a" opacity=".7" />
+                <rect
+                  x="158"
+                  y="26"
+                  width="44"
+                  height="48"
+                  rx="8"
+                  fill="url(#pG)"
+                />
+                <rect
+                  x="166"
+                  y="33"
+                  width="28"
+                  height="34"
+                  rx="5"
+                  fill="url(#pI)"
+                />
+                <circle cx="180" cy="50" r="4.5" fill="#c9922a" opacity=".7" />
+                <rect
+                  x="60"
+                  y="45"
+                  width="100"
+                  height="3"
+                  rx="1.5"
+                  fill="rgba(255,255,255,0.13)"
+                />
+                <line
+                  x1="92"
+                  y1="46"
+                  x2="92"
+                  y2="54"
+                  stroke="rgba(0,0,0,0.22)"
+                  stroke-width="1.5"
+                />
+                <line
+                  x1="104"
+                  y1="46"
+                  x2="104"
+                  y2="54"
+                  stroke="rgba(0,0,0,0.22)"
+                  stroke-width="1.5"
+                />
+                <line
+                  x1="116"
+                  y1="46"
+                  x2="116"
+                  y2="54"
+                  stroke="rgba(0,0,0,0.22)"
+                  stroke-width="1.5"
+                />
+                <line
+                  x1="128"
+                  y1="46"
+                  x2="128"
+                  y2="54"
+                  stroke="rgba(0,0,0,0.22)"
+                  stroke-width="1.5"
+                />
+                <defs>
+                  <linearGradient id="bG" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#c8c8c8" />
+                    <stop offset="100%" stop-color="#787878" />
+                  </linearGradient>
+                  <linearGradient id="pG" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#c9922a" />
+                    <stop offset="100%" stop-color="#8a5c0a" />
+                  </linearGradient>
+                  <linearGradient id="pI" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#e0a83a" />
+                    <stop offset="100%" stop-color="#b07418" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+
+            <!-- Floating stat cards -->
+            <div class="lp-fc fc-tl">
+              <div class="lp-fc-label">Active Members</div>
+              <div class="lp-fc-val" style="color: var(--gold-bright)">248</div>
+              <div class="lp-fc-sub">Growing every week</div>
+            </div>
+
+            <div class="lp-fc fc-bl">
+              <div class="lp-fc-label">Satisfaction Rate</div>
+              <div class="lp-fc-val" style="color: var(--teal)">98%</div>
+              <div class="hb-line">
+                <svg width="72" height="20" viewBox="0 0 72 20">
+                  <polyline
+                    points="0,10 10,10 16,3 22,17 28,10 36,10 42,4 46,16 52,10 72,10"
+                    fill="none"
+                    stroke="#1ec99a"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            <div class="lp-fc fc-tr">
+              <div class="lp-fc-label">Weekly Classes</div>
+              <div class="lp-fc-val" style="color: var(--purple)">40+</div>
+              <div class="lp-fc-sub">All skill levels</div>
+            </div>
+          </div>
+          <!-- /gym-scene -->
+
+          <h2 class="lp-headline">
+            Start Your <em>Fitness</em><br />Journey Today
+          </h2>
+          <p class="lp-sub">
+            Join hundreds of members who have already made PeakFit their fitness
+            home. Your strongest self starts here.
+          </p>
+        </div>
+
+        <!-- Benefits -->
+        <div class="lp-benefits">
+          <div class="lp-benefit">
+            <div class="lp-benefit-icon">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            Your data is private and securely stored
+          </div>
+          <div class="lp-benefit">
+            <div class="lp-benefit-icon">
+              <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            Instant access to your member dashboard
+          </div>
+          <div class="lp-benefit">
+            <div class="lp-benefit-icon"><i class="fa-solid fa-users"></i></div>
+            Join a welcoming, motivated community
+          </div>
+        </div>
+      </div>
+      <!-- /left-panel -->
+
+      <!-- ══════════════════════════════════════
+       RIGHT PANEL — FORM
+  ══════════════════════════════════════ -->
+      <div class="right-panel">
+        <div class="form-wrap">
+          <!-- Back to home -->
+          <a href="index.html" class="back-home fu">
+            <i class="fa-solid fa-arrow-left"></i> Back to PeakFit Gym
+          </a>
+
+          <!-- ── STEP PROGRESS ── -->
+          <div class="step-progress fu-1" id="stepProgress">
+            <!-- Step 1 -->
+            <div class="step-item">
+              <div class="step-circle active" id="stepCircle1">1</div>
+              <div class="step-label active" id="stepLabel1">Personal</div>
+            </div>
+            <div class="step-line" id="stepLine1"></div>
+            <!-- Step 2 -->
+            <div class="step-item">
+              <div class="step-circle" id="stepCircle2">2</div>
+              <div class="step-label" id="stepLabel2">Account</div>
+            </div>
+            <div class="step-line" id="stepLine2"></div>
+            <!-- Step 3 -->
+            <div class="step-item">
+              <div class="step-circle" id="stepCircle3">3</div>
+              <div class="step-label" id="stepLabel3">Membership</div>
+            </div>
+          </div>
+
+          <!-- ── FORM HEADER ── -->
+          <div class="form-header fu-2" id="formHeader">
+            <div class="form-eyebrow" id="formEyebrow">Step 1 of 3</div>
+            <h1 class="form-title" id="formTitle">
+              Tell Us About <em>Yourself</em>
+            </h1>
+            <p class="form-subtitle" id="formSubtitle">
+              We'd love to get to know you. Fill in your personal details to get
+              started.
+            </p>
+          </div>
+
+          <!-- ══════════════════════
+           STEP 1 — Personal Info
+      ══════════════════════ -->
+          <div class="form-step active fu-3" id="step1">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="firstName"
+                  >First Name <span class="required">*</span></label
+                >
+                <div class="input-wrap">
+                  <i class="fa-solid fa-user input-icon"></i>
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    class="form-control"
+                    placeholder="e.g. Aminu"
+                    autocomplete="given-name"
+                  />
+                </div>
+                <div class="form-error" id="firstNameError">
+                  <i class="fa-solid fa-circle-exclamation"></i> Please enter
+                  your first name
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="lastName"
+                  >Last Name <span class="required">*</span></label
+                >
+                <div class="input-wrap">
+                  <i class="fa-solid fa-user input-icon"></i>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    class="form-control"
+                    placeholder="e.g. Kano"
+                    autocomplete="family-name"
+                  />
+                </div>
+                <div class="form-error" id="lastNameError">
+                  <i class="fa-solid fa-circle-exclamation"></i> Please enter
+                  your last name
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="email"
+                >Email Address <span class="required">*</span></label
+              >
+              <div class="input-wrap">
+                <i class="fa-solid fa-envelope input-icon"></i>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  class="form-control"
+                  placeholder="you@example.com"
+                  autocomplete="email"
+                />
+              </div>
+              <div class="form-error" id="emailError">
+                <i class="fa-solid fa-circle-exclamation"></i> Please enter a
+                valid email address
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="phone"
+                >Phone Number <span class="required">*</span></label
+              >
+              <div class="input-wrap">
+                <i class="fa-solid fa-phone input-icon"></i>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  class="form-control"
+                  placeholder="+234 800 000 0000"
+                  autocomplete="tel"
+                />
+              </div>
+              <div class="form-error" id="phoneError">
+                <i class="fa-solid fa-circle-exclamation"></i> Please enter a
+                valid phone number
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="dob"
+                  >Date of Birth <span class="required">*</span></label
+                >
+                <div class="input-wrap">
+                  <i class="fa-solid fa-cake-candles input-icon"></i>
+                  <input type="date" id="dob" name="dob" class="form-control" />
+                </div>
+                <div class="form-error" id="dobError">
+                  <i class="fa-solid fa-circle-exclamation"></i> Please enter
+                  your date of birth
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="gender"
+                  >Gender <span class="required">*</span></label
+                >
+                <div class="input-wrap">
+                  <i class="fa-solid fa-venus-mars input-icon"></i>
+                  <select id="gender" name="gender" class="form-control">
+                    <option value="" disabled selected>Select gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="prefer-not">Prefer not to say</option>
+                  </select>
+                </div>
+                <div class="form-error" id="genderError">
+                  <i class="fa-solid fa-circle-exclamation"></i> Please select
+                  your gender
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="address">Home Address</label>
+              <div class="input-wrap">
+                <i class="fa-solid fa-location-dot input-icon"></i>
+                <input
+                  type="text"
+                  id="address"
+                  name="address"
+                  class="form-control"
+                  placeholder="Street, City, State"
+                  autocomplete="street-address"
+                />
+              </div>
+            </div>
+
+            <div class="step-nav">
+              <button
+                class="btn-next"
+                id="nextStep1"
+                type="button"
+                onclick="nextStep1()"
+              >
+                Continue <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+          <!-- /step1 -->
+
+          <!-- ══════════════════════
+           STEP 2 — Account Setup
+      ══════════════════════ -->
+          <div class="form-step" id="step2">
+            <div class="form-group">
+              <label class="form-label" for="username"
+                >Username <span class="required">*</span></label
+              >
+              <div class="input-wrap">
+                <i class="fa-solid fa-at input-icon"></i>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  class="form-control"
+                  placeholder="Choose a username"
+                  autocomplete="username"
+                />
+              </div>
+              <div class="form-hint">
+                Only letters, numbers, and underscores. Min. 4 characters.
+              </div>
+              <div class="form-error" id="usernameError">
+                <i class="fa-solid fa-circle-exclamation"></i> Username must be
+                at least 4 characters
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="password"
+                >Password <span class="required">*</span></label
+              >
+              <div class="input-wrap">
+                <i class="fa-solid fa-lock input-icon"></i>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  class="form-control"
+                  placeholder="Create a strong password"
+                  autocomplete="new-password"
+                />
+                <button
+                  onclick="showPasswordToogle()"
+                  type="button"
+                  class="pw-toggle"
+                  id="pwToggle1"
+                  aria-label="Show password"
+                >
+                  <i class="fa-regular fa-eye" id="pwToggleIcon1"></i>
+                </button>
+              </div>
+              <!-- Password strength indicator -->
+              <div class="pw-strength" id="pwStrength">
+                <div class="pw-bars">
+                  <div class="pw-bar" id="pwBar1"></div>
+                  <div class="pw-bar" id="pwBar2"></div>
+                  <div class="pw-bar" id="pwBar3"></div>
+                  <div class="pw-bar" id="pwBar4"></div>
+                </div>
+                <div class="pw-label" id="pwLabel">Enter a password</div>
+              </div>
+              <div class="form-error" id="passwordError">
+                <i class="fa-solid fa-circle-exclamation"></i> Password must be
+                at least 8 characters
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="confirmPassword"
+                >Confirm Password <span class="required">*</span></label
+              >
+              <div class="input-wrap">
+                <i class="fa-solid fa-lock input-icon"></i>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  class="form-control"
+                  placeholder="Re-enter your password"
+                  autocomplete="new-password"
+                />
+                <button
+                  onclick="showPasswordToogle2()"
+                  type="button"
+                  class="pw-toggle"
+                  id="pwToggle2"
+                  aria-label="Show password"
+                >
+                  <i class="fa-regular fa-eye" id="pwToggleIcon2"></i>
+                </button>
+              </div>
+              <div class="form-error" id="confirmPasswordError">
+                <i class="fa-solid fa-circle-exclamation"></i> Passwords do not
+                match
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="emergencyContact"
+                >Emergency Contact Name</label
+              >
+              <div class="input-wrap">
+                <i class="fa-solid fa-user-shield input-icon"></i>
+                <input
+                  type="text"
+                  id="emergencyContact"
+                  name="emergencyContact"
+                  class="form-control"
+                  placeholder="Full name of emergency contact"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="emergencyPhone"
+                >Emergency Contact Phone</label
+              >
+              <div class="input-wrap">
+                <i class="fa-solid fa-phone input-icon"></i>
+                <input
+                  type="tel"
+                  id="emergencyPhone"
+                  name="emergencyPhone"
+                  class="form-control"
+                  placeholder="+234 800 000 0000"
+                />
+              </div>
+            </div>
+
+            <div class="step-nav">
+              <button
+                class="btn-back"
+                onclick="backStep2()"
+                id="backStep2"
+                type="button"
+              >
+                <i class="fa-solid fa-arrow-left"></i> Back
+              </button>
+              <button
+                class="btn-next"
+                id="nextStep2"
+                type="button"
+                onclick="nextStep2()"
+              >
+                Continue <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+          <!-- /step2 -->
+
+          <!-- ══════════════════════
+           STEP 3 — Membership
+      ══════════════════════ -->
+          <div class="form-step" id="step3">
+            <div class="section-label">Choose Your Membership Plan</div>
+
+            <div class="plan-selector" id="planSelector">
+              <button
+                class="plan-option"
+                data-plan="basic"
+                id="planBasic"
+                onclick="selectPlan('basic')"
+              >
+                <div class="plan-radio" id="radioBasic"></div>
+                <div class="plan-info">
+                  <div class="plan-name-text">Basic</div>
+                  <div class="plan-desc-text">Gym floor + cardio equipment</div>
+                </div>
+                <div class="plan-price-tag">₦8,000 <span>/mo</span></div>
+              </button>
+
+              <button
+                class="plan-option selected"
+                data-plan="premium"
+                id="planPremium"
+                onclick="selectPlan('premium')"
+              >
+                <div class="plan-badge">Most Popular</div>
+                <div class="plan-radio" id="radioPremium"></div>
+                <div class="plan-info">
+                  <div class="plan-name-text">Premium</div>
+                  <div class="plan-desc-text">
+                    All basic + group classes + 2 PT sessions
+                  </div>
+                </div>
+                <div class="plan-price-tag">₦15,000 <span>/mo</span></div>
+              </button>
+
+              <button
+                class="plan-option"
+                data-plan="elite"
+                id="planElite"
+                onclick="selectPlan('elite')"
+              >
+                <div class="plan-radio" id="radioElite"></div>
+                <div class="plan-info">
+                  <div class="plan-name-text">Elite</div>
+                  <div class="plan-desc-text">
+                    Everything + unlimited PT + nutrition coaching
+                  </div>
+                </div>
+                <div class="plan-price-tag">₦25,000 <span>/mo</span></div>
+              </button>
+            </div>
+
+            <input
+              type="hidden"
+              id="selectedPlan"
+              name="selectedPlan"
+              value="premium"
+            />
+            <div class="form-error" id="planError">
+              <i class="fa-solid fa-circle-exclamation"></i> Please select a
+              membership plan
+            </div>
+
+            <div class="form-group" style="margin-top: 4px">
+              <label class="form-label" for="fitnessGoal"
+                >Your Primary Fitness Goal</label
+              >
+              <div class="input-wrap">
+                <i class="fa-solid fa-bullseye input-icon"></i>
+                <select
+                  id="fitnessGoal"
+                  name="fitnessGoal"
+                  class="form-control"
+                >
+                  <option value="" disabled selected>
+                    What are you training for?
+                  </option>
+                  <option value="weight-loss">Weight Loss</option>
+                  <option value="muscle-gain">Muscle Gain</option>
+                  <option value="general-fitness">General Fitness</option>
+                  <option value="endurance & Cardio">
+                    Endurance &amp; Cardio
+                  </option>
+                  <option value="flexibility">
+                    Flexibility &amp; Mobility
+                  </option>
+                  <option value="stress-relief">
+                    Stress Relief &amp; Wellness
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="startDate"
+                >Preferred Start Date <span class="required">*</span></label
+              >
+              <div class="input-wrap">
+                <i class="fa-solid fa-calendar-days input-icon"></i>
+                <input
+                  type="date"
+                  id="startDate"
+                  name="startDate"
+                  class="form-control"
+                />
+              </div>
+              <div class="form-error" id="startDateError">
+                <i class="fa-solid fa-circle-exclamation"></i> Please select a
+                start date
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="referral"
+                >How Did You Hear About Us?</label
+              >
+              <div class="input-wrap">
+                <i class="fa-solid fa-share-nodes input-icon"></i>
+                <select id="referral" name="referral" class="form-control">
+                  <option value="" disabled selected>Select an option</option>
+                  <option value="friend">Friend or Family</option>
+                  <option value="social-media">Social Media</option>
+                  <option value="google">Google Search</option>
+                  <option value="flyer">Flyer / Poster</option>
+                  <option value="walk-in">Walked Past</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Terms & Conditions -->
+            <div class="checkbox-group" id="termsGroup">
+              <div class="checkbox-box" id="termsCheckbox"></div>
+              <div class="checkbox-text">
+                I agree to PeakFit Gym's
+                <a href="#">Terms &amp; Conditions</a> and
+                <a href="#">Privacy Policy</a>. I understand that my membership
+                is subject to the gym's rules and code of conduct.
+              </div>
+            </div>
+            <div class="form-error" id="termsError">
+              <i class="fa-solid fa-circle-exclamation"></i> You must agree to
+              the terms to continue
+            </div>
+
+            <div class="step-nav" style="margin-top: 20px">
+              <button class="btn-back" id="backStep3" type="button">
+                <i class="fa-solid fa-arrow-left"></i> Back
+              </button>
+              <button
+                class="btn-next"
+                id="submitForm"
+                type="button"
+                onclick="completeReg()"
+                style="background: var(--gold)"
+              >
+                <i class="fa-solid fa-check"></i> Complete Registration
+              </button>
+            </div>
+          </div>
+          <!-- /step3 -->
+
+          <!-- ══════════════════════
+           SUCCESS STATE
+      ══════════════════════ -->
+          <div class="success-state" id="successState">
+            <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+            <h2 class="success-title">Welcome to <em>PeakFit!</em></h2>
+            <p class="success-desc">
+              Your membership registration is complete. You can now log in to
+              access your personal member dashboard and start your fitness
+              journey.
+            </p>
+            <div class="success-actions">
+              <a
+                href="login.html"
+                class="btn-next"
+                style="
+                  text-decoration: none;
+                  justify-content: center;
+                  border-radius: var(--r-sm);
+                "
+              >
+                <i class="fa-solid fa-arrow-right-to-bracket"></i> Login to Your
+                Dashboard
+              </a>
+              <a
+                href="index.html"
+                class="btn-back"
+                style="justify-content: center"
+              >
+                <i class="fa-solid fa-house"></i> Back to Homepage
+              </a>
+            </div>
+          </div>
+
+          <!-- Sign in link -->
+          <div class="signin-link fu-6" id="signinLink">
+            Already a member? <a href="login.html">Sign in here</a>
+          </div>
+        </div>
+        <!-- /form-wrap -->
+      </div>
+      <!-- /right-panel -->
+    </div>
+    <!-- /page-wrap -->
+  </body>
+  <script src="JS/register.js"></script>
+</html>

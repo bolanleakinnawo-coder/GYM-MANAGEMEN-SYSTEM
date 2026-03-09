@@ -1,0 +1,2707 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PeakFit Gym — Where Your Best Self Begins</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <style>
+      /* ═══════════════════════════════════════
+       VARIABLES
+    ═══════════════════════════════════════ */
+      :root {
+        --black: #08090b;
+        --dark: #0d0f13;
+        --dark2: #13161c;
+        --dark3: #191c24;
+        --dark4: #1f222c;
+        --gold: #c9922a;
+        --gold-lt: #e0a83a;
+        --gold-bright: #f0b429;
+        --gold-dim: rgba(201, 146, 42, 0.13);
+        --gold-glow: rgba(201, 146, 42, 0.25);
+        --teal: #1ec99a;
+        --teal-dim: rgba(30, 201, 154, 0.11);
+        --purple: #7c6af7;
+        --purple-dim: rgba(124, 106, 247, 0.11);
+        --red: #e85555;
+        --white: #ffffff;
+        --cream: #f5f0e8;
+        --w90: rgba(255, 255, 255, 0.9);
+        --w70: rgba(255, 255, 255, 0.7);
+        --w50: rgba(255, 255, 255, 0.5);
+        --w35: rgba(255, 255, 255, 0.35);
+        --w15: rgba(255, 255, 255, 0.15);
+        --w08: rgba(255, 255, 255, 0.08);
+        --w05: rgba(255, 255, 255, 0.05);
+        --border: rgba(255, 255, 255, 0.08);
+        --r-xs: 5px;
+        --r-sm: 9px;
+        --r-md: 14px;
+        --r-lg: 20px;
+        --r-xl: 28px;
+        --ff-display: "Cormorant Garamond", serif;
+        --ff-body: "DM Sans", sans-serif;
+        --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* ═══════════════════════════════════════
+       RESET
+    ═══════════════════════════════════════ */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: var(--ff-body);
+        background: var(--black);
+        color: var(--white);
+        overflow-x: hidden;
+        line-height: 1.7;
+        font-size: 15px;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      ul {
+        list-style: none;
+      }
+
+      /* Subtle noise grain overlay */
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 0.35;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+      }
+
+      /* ═══════════════════════════════════════
+       ANIMATIONS
+    ═══════════════════════════════════════ */
+      @keyframes fade-up {
+        from {
+          opacity: 0;
+          transform: translateY(28px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+      @keyframes float-slow {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-14px);
+        }
+      }
+      @keyframes lift {
+        0%,
+        100% {
+          transform: translateY(0) rotate(-3deg);
+        }
+        45% {
+          transform: translateY(-20px) rotate(3deg);
+        }
+      }
+      @keyframes pulse-glow {
+        0%,
+        100% {
+          opacity: 0.35;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.75;
+          transform: scale(1.08);
+        }
+      }
+      @keyframes spin-slow {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes ticker {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+      @keyframes underline {
+        from {
+          transform: scaleX(0);
+        }
+        to {
+          transform: scaleX(1);
+        }
+      }
+      @keyframes orb-drift {
+        from {
+          transform: translate(0, 0);
+        }
+        to {
+          transform: translate(20px, 14px);
+        }
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.25;
+        }
+      }
+      @keyframes heartbeat {
+        0%,
+        100% {
+          transform: scaleX(1);
+        }
+        50% {
+          transform: scaleX(1.04);
+        }
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: -400px 0;
+        }
+        100% {
+          background-position: 400px 0;
+        }
+      }
+
+      .fu {
+        animation: fade-up 0.8s var(--ease) both;
+      }
+      .fu-1 {
+        animation: fade-up 0.8s var(--ease) 0.1s both;
+      }
+      .fu-2 {
+        animation: fade-up 0.8s var(--ease) 0.2s both;
+      }
+      .fu-3 {
+        animation: fade-up 0.8s var(--ease) 0.32s both;
+      }
+      .fu-4 {
+        animation: fade-up 0.8s var(--ease) 0.44s both;
+      }
+      .fu-5 {
+        animation: fade-up 0.8s var(--ease) 0.56s both;
+      }
+      .fi {
+        animation: fade-in 1.2s var(--ease) 0.1s both;
+      }
+
+      /* ═══════════════════════════════════════
+       UTILS
+    ═══════════════════════════════════════ */
+      .container {
+        width: 100%;
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 0 32px;
+      }
+      .text-gold {
+        color: var(--gold-bright);
+      }
+      .text-teal {
+        color: var(--teal);
+      }
+
+      /* ═══════════════════════════════════════
+       BUTTONS
+    ═══════════════════════════════════════ */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 13px 28px;
+        border-radius: var(--r-xs);
+        font-family: var(--ff-body);
+        font-size: 13.5px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        letter-spacing: 0.4px;
+        transition: all 0.24s var(--ease);
+        white-space: nowrap;
+        text-decoration: none;
+      }
+      .btn-gold {
+        background: var(--gold);
+        color: #fff;
+        letter-spacing: 0.5px;
+      }
+      .btn-gold:hover {
+        background: var(--gold-lt);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 28px var(--gold-glow);
+      }
+      .btn-outline {
+        background: transparent;
+        color: var(--w70);
+        border: 1px solid var(--w15);
+      }
+      .btn-outline:hover {
+        border-color: var(--w35);
+        background: var(--w05);
+        color: var(--white);
+      }
+      .btn-outline-gold {
+        background: transparent;
+        color: var(--gold-bright);
+        border: 1px solid rgba(201, 146, 42, 0.4);
+      }
+      .btn-outline-gold:hover {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+      }
+      .btn-lg {
+        padding: 15px 34px;
+        font-size: 14.5px;
+      }
+      .btn-sm {
+        padding: 9px 18px;
+        font-size: 12.5px;
+      }
+      .btn-teal {
+        background: transparent;
+        color: var(--teal);
+        border: 1px solid rgba(30, 201, 154, 0.35);
+      }
+      .btn-teal:hover {
+        background: var(--teal-dim);
+        border-color: var(--teal);
+      }
+      .btn-purple {
+        background: transparent;
+        color: var(--purple);
+        border: 1px solid rgba(124, 106, 247, 0.35);
+      }
+      .btn-purple:hover {
+        background: var(--purple-dim);
+        border-color: var(--purple);
+      }
+
+      /* ═══════════════════════════════════════
+       NAV
+    ═══════════════════════════════════════ */
+      .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 500;
+        padding: 20px 0;
+        background: rgba(8, 9, 11, 0.92);
+        backdrop-filter: blur(24px);
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-inner {
+        display: flex;
+        align-items: center;
+      }
+      .nav-logo {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        flex-shrink: 0;
+        margin-right: auto;
+      }
+      .nav-logo-mark {
+        width: 40px;
+        height: 40px;
+        background: var(--gold);
+        border-radius: var(--r-xs);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: #fff;
+      }
+      .nav-logo-text {
+        font-family: var(--ff-display);
+        font-size: 22px;
+        font-weight: 600;
+        color: var(--white);
+        letter-spacing: 0.3px;
+        line-height: 1.1;
+      }
+      .nav-logo-text span {
+        color: var(--gold-bright);
+        font-style: italic;
+      }
+      .nav-logo-sub {
+        font-size: 10px;
+        color: var(--w35);
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        margin-top: 1px;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .nav-link {
+        padding: 7px 15px;
+        border-radius: var(--r-xs);
+        color: var(--w50);
+        font-size: 13.5px;
+        font-weight: 500;
+        transition: all 0.2s;
+        letter-spacing: 0.2px;
+      }
+      .nav-link:hover {
+        color: var(--white);
+        background: var(--w05);
+      }
+      .nav-divider {
+        width: 1px;
+        height: 20px;
+        background: var(--border);
+        margin: 0 10px;
+      }
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: 20px;
+      }
+      .nav-hamburger {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 6px;
+        margin-left: auto;
+      }
+      .nav-hamburger span {
+        display: block;
+        width: 22px;
+        height: 1.5px;
+        background: var(--w70);
+        border-radius: 2px;
+      }
+
+      /* ═══════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════ */
+      .hero-wrap {
+        position: relative;
+        overflow: hidden;
+        min-height: 100vh;
+      }
+
+      /* Grid background */
+      .hero-grid-bg {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.018) 1px,
+            transparent 1px
+          );
+        background-size: 72px 72px;
+        mask-image: radial-gradient(
+          ellipse 85% 75% at 50% 50%,
+          black 20%,
+          transparent 100%
+        );
+      }
+
+      /* Ambient orbs */
+      .orb {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        filter: blur(80px);
+      }
+      .orb-1 {
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(
+          circle,
+          rgba(201, 146, 42, 0.16) 0%,
+          transparent 65%
+        );
+        top: -180px;
+        right: -100px;
+        animation: orb-drift 12s ease-in-out infinite alternate;
+      }
+      .orb-2 {
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(
+          circle,
+          rgba(30, 201, 154, 0.07) 0%,
+          transparent 65%
+        );
+        bottom: -120px;
+        left: -80px;
+      }
+      .orb-3 {
+        width: 280px;
+        height: 280px;
+        background: radial-gradient(
+          circle,
+          rgba(201, 146, 42, 0.08) 0%,
+          transparent 65%
+        );
+        top: 50%;
+        left: 38%;
+      }
+
+      .hero-inner {
+        display: grid;
+        grid-template-columns: 1.05fr 1fr;
+        align-items: center;
+        gap: 56px;
+        min-height: 100vh;
+        padding: 130px 32px 80px;
+        max-width: 1160px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+      }
+
+      /* LEFT — Text */
+      .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--gold-dim);
+        border: 1px solid rgba(201, 146, 42, 0.25);
+        color: var(--gold-bright);
+        border-radius: 100px;
+        padding: 6px 16px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        margin-bottom: 28px;
+      }
+      .eyebrow-dot {
+        width: 6px;
+        height: 6px;
+        background: var(--gold-bright);
+        border-radius: 50%;
+        animation: blink 1.8s ease-in-out infinite;
+      }
+
+      .hero-title {
+        font-family: var(--ff-display);
+        font-size: clamp(46px, 5.5vw, 74px);
+        font-weight: 600;
+        line-height: 1.07;
+        letter-spacing: -0.5px;
+        color: var(--white);
+        margin-bottom: 10px;
+      }
+      .hero-title em {
+        font-style: italic;
+        color: var(--gold-bright);
+        position: relative;
+        display: inline-block;
+      }
+      .hero-title em::after {
+        content: "";
+        position: absolute;
+        bottom: 3px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--gold);
+        border-radius: 2px;
+        transform-origin: left;
+        animation: underline 0.9s var(--ease) 0.7s both;
+      }
+      .hero-title-line2 {
+        font-family: var(--ff-display);
+        font-size: clamp(46px, 5.5vw, 74px);
+        font-weight: 300;
+        font-style: italic;
+        color: var(--w50);
+        display: block;
+        letter-spacing: 0.5px;
+        margin-bottom: 28px;
+      }
+
+      .hero-desc {
+        font-size: 16px;
+        color: var(--w55);
+        line-height: 1.8;
+        max-width: 490px;
+        margin-bottom: 40px;
+      }
+
+      .hero-cta {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 50px;
+      }
+
+      /* Trust badges */
+      .hero-badges {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        border: 1px solid var(--border);
+        border-radius: 100px;
+        overflow: hidden;
+        width: fit-content;
+      }
+      .hero-badge-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        font-size: 12.5px;
+        color: var(--w55);
+        font-weight: 500;
+        border-right: 1px solid var(--border);
+      }
+      .hero-badge-item:last-child {
+        border-right: none;
+      }
+      .hero-badge-item i {
+        color: var(--gold-bright);
+        font-size: 12px;
+      }
+
+      /* RIGHT — Gym Visual */
+      .hero-visual {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .gym-scene {
+        position: relative;
+        width: 420px;
+        height: 420px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Rings */
+      .g-ring {
+        position: absolute;
+        border-radius: 50%;
+        border: 1px solid rgba(201, 146, 42, 0.1);
+      }
+      .g-ring-1 {
+        width: 390px;
+        height: 390px;
+      }
+      .g-ring-2 {
+        width: 305px;
+        height: 305px;
+        border-color: rgba(201, 146, 42, 0.07);
+      }
+      .g-ring-3 {
+        width: 220px;
+        height: 220px;
+        border: 1px dashed rgba(201, 146, 42, 0.12);
+        animation: spin-slow 28s linear infinite;
+      }
+      .g-glow {
+        position: absolute;
+        width: 190px;
+        height: 190px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(201, 146, 42, 0.2) 0%,
+          transparent 70%
+        );
+        animation: pulse-glow 3.5s ease-in-out infinite;
+      }
+
+      /* Dumbbell */
+      .dumbbell-wrap {
+        position: relative;
+        animation: lift 4s ease-in-out infinite;
+        z-index: 5;
+      }
+      .dumbbell-svg {
+        width: 210px;
+        height: auto;
+        filter: drop-shadow(0 10px 32px rgba(201, 146, 42, 0.4));
+      }
+
+      /* Stat cards */
+      .sc {
+        position: absolute;
+        z-index: 10;
+        background: rgba(19, 22, 28, 0.9);
+        border: 1px solid var(--border);
+        border-radius: var(--r-md);
+        padding: 14px 18px;
+        backdrop-filter: blur(16px);
+        box-shadow: 0 16px 44px rgba(0, 0, 0, 0.55);
+      }
+      .sc-label {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.9px;
+        color: var(--w35);
+        margin-bottom: 4px;
+      }
+      .sc-val {
+        font-family: var(--ff-display);
+        font-size: 26px;
+        font-weight: 600;
+        line-height: 1;
+      }
+      .sc-sub {
+        font-size: 11px;
+        color: var(--w35);
+        margin-top: 4px;
+      }
+      .sc-1 {
+        top: 22px;
+        left: -30px;
+        animation: float 4.5s ease-in-out infinite;
+      }
+      .sc-2 {
+        bottom: 44px;
+        left: -40px;
+        animation: float-slow 5.5s ease-in-out 0.8s infinite;
+      }
+      .sc-3 {
+        top: 55px;
+        right: -28px;
+        animation: float 4s ease-in-out 0.4s infinite;
+      }
+      .sc-4 {
+        bottom: 36px;
+        right: -16px;
+        animation: float-slow 5s ease-in-out 1.1s infinite;
+      }
+
+      /* mini bar chart */
+      .mini-bars {
+        display: flex;
+        align-items: flex-end;
+        gap: 4px;
+        height: 26px;
+        margin-top: 7px;
+      }
+      .mb {
+        width: 8px;
+        border-radius: 2px 2px 0 0;
+        background: rgba(201, 146, 42, 0.25);
+      }
+      .mb.hi {
+        background: var(--gold);
+      }
+
+      /* heartbeat line */
+      .hb-line {
+        margin-top: 7px;
+        animation: heartbeat 1.3s ease-in-out infinite;
+      }
+
+      /* ═══════════════════════════════════════
+       DIVIDER LINE
+    ═══════════════════════════════════════ */
+      .section-divider {
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--border),
+          transparent
+        );
+      }
+
+      /* ═══════════════════════════════════════
+       TICKER
+    ═══════════════════════════════════════ */
+      .ticker-wrap {
+        background: var(--dark2);
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        padding: 14px 0;
+        overflow: hidden;
+      }
+      .ticker-track {
+        display: flex;
+        width: max-content;
+        animation: ticker 34s linear infinite;
+      }
+      .ticker-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 32px;
+        font-size: 12.5px;
+        font-weight: 500;
+        color: var(--w35);
+        white-space: nowrap;
+        letter-spacing: 0.3px;
+      }
+      .ticker-item i {
+        color: var(--gold);
+        font-size: 10px;
+      }
+      .ticker-sep {
+        color: var(--w08);
+        font-size: 18px;
+      }
+
+      /* ═══════════════════════════════════════
+       SECTION COMMONS
+    ═══════════════════════════════════════ */
+      .section {
+        padding: 96px 0;
+      }
+      .section-dark {
+        background: var(--dark);
+      }
+      .section-dark2 {
+        background: var(--dark2);
+      }
+      .section-black {
+        background: var(--black);
+      }
+
+      .section-tag {
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 14px;
+      }
+      .section-heading {
+        font-family: var(--ff-display);
+        font-size: clamp(34px, 4.2vw, 54px);
+        font-weight: 600;
+        letter-spacing: -0.3px;
+        line-height: 1.1;
+        color: var(--white);
+        margin-bottom: 18px;
+      }
+      .section-heading em {
+        font-style: italic;
+        color: var(--gold-bright);
+      }
+      .section-heading .light {
+        font-weight: 300;
+        font-style: italic;
+        color: var(--w50);
+      }
+      .section-body {
+        font-size: 15.5px;
+        color: var(--w55);
+        max-width: 580px;
+        line-height: 1.82;
+      }
+
+      /* gold ruled line under section tag */
+      .ruled-tag {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+      .ruled-tag span {
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: var(--gold);
+        white-space: nowrap;
+      }
+      .ruled-tag::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          rgba(201, 146, 42, 0.4),
+          transparent
+        );
+      }
+
+      /* ═══════════════════════════════════════
+       WELCOME / ABOUT SECTION
+    ═══════════════════════════════════════ */
+      .welcome-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        align-items: center;
+      }
+      .welcome-text {
+      }
+      .welcome-quote {
+        font-family: var(--ff-display);
+        font-size: 22px;
+        font-style: italic;
+        font-weight: 400;
+        color: var(--w70);
+        line-height: 1.55;
+        border-left: 2px solid var(--gold);
+        padding-left: 22px;
+        margin: 28px 0 32px;
+      }
+      .welcome-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--border);
+        border-radius: var(--r-md);
+        overflow: hidden;
+        margin-top: 40px;
+      }
+      .ws-item {
+        background: var(--dark3);
+        padding: 22px 18px;
+        text-align: center;
+        transition: background 0.22s;
+      }
+      .ws-item:hover {
+        background: var(--dark4);
+      }
+      .ws-num {
+        font-family: var(--ff-display);
+        font-size: 40px;
+        font-weight: 600;
+        color: var(--gold-bright);
+        line-height: 1;
+        letter-spacing: -1px;
+        margin-bottom: 5px;
+      }
+      .ws-label {
+        font-size: 12px;
+        color: var(--w35);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+
+      /* Visual cards grid */
+      .welcome-visual {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .wv-card {
+        background: var(--dark3);
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        padding: 24px 20px;
+        transition: all 0.25s var(--ease);
+      }
+      .wv-card:hover {
+        border-color: rgba(201, 146, 42, 0.25);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+      }
+      .wv-card:nth-child(2) {
+        margin-top: 28px;
+      }
+      .wv-card:nth-child(4) {
+        margin-top: 28px;
+      }
+      .wv-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        margin-bottom: 14px;
+      }
+      .wv-icon.gold {
+        background: var(--gold-dim);
+        color: var(--gold-bright);
+      }
+      .wv-icon.teal {
+        background: var(--teal-dim);
+        color: var(--teal);
+      }
+      .wv-icon.purple {
+        background: var(--purple-dim);
+        color: var(--purple);
+      }
+      .wv-icon.red {
+        background: rgba(232, 85, 85, 0.1);
+        color: var(--red);
+      }
+      .wv-title {
+        font-family: var(--ff-display);
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--white);
+        margin-bottom: 5px;
+      }
+      .wv-desc {
+        font-size: 13px;
+        color: var(--w35);
+        line-height: 1.65;
+      }
+
+      /* ═══════════════════════════════════════
+       OFFERINGS / WHAT WE OFFER
+    ═══════════════════════════════════════ */
+      .offerings-intro {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        align-items: end;
+        margin-bottom: 52px;
+      }
+      .offerings-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+      .offer-card {
+        background: var(--dark3);
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        padding: 28px 24px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.28s var(--ease);
+      }
+      .offer-card::before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        opacity: 0;
+        transition: opacity 0.28s;
+      }
+      .offer-card.c-gold::before {
+        background: var(--gold);
+      }
+      .offer-card.c-teal::before {
+        background: var(--teal);
+      }
+      .offer-card.c-purple::before {
+        background: var(--purple);
+      }
+      .offer-card.c-red::before {
+        background: var(--red);
+      }
+      .offer-card.c-blue::before {
+        background: #38bdf8;
+      }
+      .offer-card.c-amber::before {
+        background: #fb923c;
+      }
+      .offer-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--w15);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      }
+      .offer-card:hover::before {
+        opacity: 1;
+      }
+      .offer-number {
+        font-family: var(--ff-display);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        color: var(--w35);
+        text-transform: uppercase;
+        margin-bottom: 14px;
+      }
+      .offer-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 21px;
+        margin-bottom: 18px;
+      }
+      .offer-icon.gold {
+        background: var(--gold-dim);
+        color: var(--gold-bright);
+      }
+      .offer-icon.teal {
+        background: var(--teal-dim);
+        color: var(--teal);
+      }
+      .offer-icon.purple {
+        background: var(--purple-dim);
+        color: var(--purple);
+      }
+      .offer-icon.red {
+        background: rgba(232, 85, 85, 0.1);
+        color: var(--red);
+      }
+      .offer-icon.blue {
+        background: rgba(56, 189, 248, 0.1);
+        color: #38bdf8;
+      }
+      .offer-icon.amber {
+        background: rgba(251, 146, 60, 0.1);
+        color: #fb923c;
+      }
+      .offer-title {
+        font-family: var(--ff-display);
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--white);
+        margin-bottom: 10px;
+        letter-spacing: -0.1px;
+      }
+      .offer-desc {
+        font-size: 13.5px;
+        color: var(--w50);
+        line-height: 1.74;
+      }
+
+      /* ═══════════════════════════════════════
+       MEMBERSHIP PLANS
+    ═══════════════════════════════════════ */
+      .plans-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-top: 52px;
+      }
+      .plan-card {
+        border-radius: var(--r-lg);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        transition: all 0.28s var(--ease);
+        position: relative;
+      }
+      .plan-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 28px 60px rgba(0, 0, 0, 0.45);
+      }
+      .plan-card.featured {
+        border-color: rgba(201, 146, 42, 0.3);
+        box-shadow:
+          0 0 0 1px rgba(201, 146, 42, 0.1),
+          0 20px 50px rgba(0, 0, 0, 0.4);
+      }
+      .plan-featured-badge {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: var(--gold);
+        color: #000;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 100px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+      .plan-head {
+        padding: 32px 28px 26px;
+        border-bottom: 1px solid var(--border);
+        background: var(--dark3);
+      }
+      .plan-head.featured-head {
+        background: linear-gradient(145deg, #1c1800, #1a1600);
+        border-bottom-color: rgba(201, 146, 42, 0.15);
+      }
+      .plan-name {
+        font-family: var(--ff-display);
+        font-size: 26px;
+        font-weight: 600;
+        color: var(--white);
+        margin-bottom: 6px;
+        letter-spacing: -0.2px;
+      }
+      .plan-tagline {
+        font-size: 13px;
+        color: var(--w35);
+        margin-bottom: 20px;
+      }
+      .plan-price {
+        font-family: var(--ff-display);
+        font-size: 48px;
+        font-weight: 600;
+        color: var(--gold-bright);
+        line-height: 1;
+        letter-spacing: -2px;
+      }
+      .plan-price span {
+        font-size: 18px;
+        font-weight: 400;
+        color: var(--w35);
+        letter-spacing: 0;
+      }
+      .plan-body {
+        background: var(--dark2);
+        padding: 24px 28px 30px;
+      }
+      .plan-features {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 26px;
+      }
+      .plan-feat {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13.5px;
+        color: var(--w70);
+      }
+      .plan-feat i {
+        font-size: 11px;
+        color: var(--gold-bright);
+        flex-shrink: 0;
+      }
+      .plan-feat.dim i {
+        color: var(--w35);
+      }
+      .plan-feat.dim {
+        color: var(--w35);
+      }
+
+      /* ═══════════════════════════════════════
+       MEET THE TRAINERS
+    ═══════════════════════════════════════ */
+      .trainers-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-top: 52px;
+      }
+      .trainer-card {
+        background: var(--dark3);
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        overflow: hidden;
+        transition: all 0.26s var(--ease);
+      }
+      .trainer-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(201, 146, 42, 0.22);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+      }
+      .trainer-avatar {
+        height: 160px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 52px;
+        position: relative;
+        overflow: hidden;
+      }
+      .trainer-avatar-bg {
+        position: absolute;
+        inset: 0;
+        opacity: 0.5;
+      }
+      .ta-1 {
+        background: linear-gradient(145deg, #1c1800, #241e08);
+      }
+      .ta-2 {
+        background: linear-gradient(145deg, #0c1c18, #0e201c);
+      }
+      .ta-3 {
+        background: linear-gradient(145deg, #111326, #141830);
+      }
+      .ta-4 {
+        background: linear-gradient(145deg, #1a0e0e, #1e1010);
+      }
+      .trainer-initials {
+        font-family: var(--ff-display);
+        font-size: 44px;
+        font-weight: 600;
+        z-index: 2;
+        line-height: 1;
+        opacity: 0.85;
+      }
+      .trainer-info {
+        padding: 18px 18px 20px;
+      }
+      .trainer-name {
+        font-family: var(--ff-display);
+        font-size: 19px;
+        font-weight: 600;
+        color: var(--white);
+        margin-bottom: 3px;
+      }
+      .trainer-role {
+        font-size: 12px;
+        color: var(--gold-bright);
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+      .trainer-spec {
+        font-size: 12.5px;
+        color: var(--w50);
+        line-height: 1.6;
+      }
+
+      /* ═══════════════════════════════════════
+       HOW TO JOIN
+    ═══════════════════════════════════════ */
+      .join-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        margin-top: 52px;
+      }
+      .join-step {
+        background: var(--dark3);
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        padding: 32px 26px;
+        position: relative;
+        transition: all 0.25s var(--ease);
+      }
+      .join-step:hover {
+        border-color: rgba(201, 146, 42, 0.22);
+        transform: translateY(-4px);
+      }
+      .join-step-num {
+        font-family: var(--ff-display);
+        font-size: 64px;
+        font-weight: 600;
+        color: rgba(201, 146, 42, 0.07);
+        line-height: 1;
+        position: absolute;
+        top: 14px;
+        right: 18px;
+      }
+      .join-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        background: var(--gold-dim);
+        color: var(--gold-bright);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        margin-bottom: 20px;
+      }
+      .join-title {
+        font-family: var(--ff-display);
+        font-size: 22px;
+        font-weight: 600;
+        color: var(--white);
+        margin-bottom: 10px;
+        letter-spacing: -0.2px;
+      }
+      .join-desc {
+        font-size: 14px;
+        color: var(--w50);
+        line-height: 1.75;
+      }
+
+      /* ═══════════════════════════════════════
+       TESTIMONIALS
+    ═══════════════════════════════════════ */
+      .testi-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-top: 52px;
+      }
+      .testi-card {
+        background: var(--dark3);
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        padding: 28px 26px;
+        transition: all 0.25s var(--ease);
+      }
+      .testi-card:hover {
+        border-color: rgba(201, 146, 42, 0.2);
+        transform: translateY(-3px);
+      }
+      .testi-stars {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 18px;
+      }
+      .testi-stars i {
+        color: var(--gold-bright);
+        font-size: 13px;
+      }
+      .testi-text {
+        font-family: var(--ff-display);
+        font-size: 17px;
+        font-style: italic;
+        font-weight: 400;
+        color: var(--w70);
+        line-height: 1.7;
+        margin-bottom: 24px;
+      }
+      .testi-author {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .testi-av {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--ff-display);
+        font-size: 18px;
+        font-weight: 600;
+      }
+      .av-g {
+        background: var(--gold-dim);
+        color: var(--gold-bright);
+      }
+      .av-t {
+        background: var(--teal-dim);
+        color: var(--teal);
+      }
+      .av-p {
+        background: var(--purple-dim);
+        color: var(--purple);
+      }
+      .testi-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--white);
+      }
+      .testi-role {
+        font-size: 12px;
+        color: var(--w35);
+        margin-top: 1px;
+      }
+
+      /* ═══════════════════════════════════════
+       CTA BAND
+    ═══════════════════════════════════════ */
+      .cta-section {
+        padding: 80px 0 100px;
+      }
+      .cta-box {
+        background: var(--dark2);
+        border: 1px solid rgba(201, 146, 42, 0.18);
+        border-radius: var(--r-xl);
+        padding: 80px 60px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .cta-box::before {
+        content: "";
+        position: absolute;
+        top: -80px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 450px;
+        height: 240px;
+        background: radial-gradient(
+          ellipse,
+          rgba(201, 146, 42, 0.14) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .cta-title {
+        font-family: var(--ff-display);
+        font-size: clamp(38px, 5vw, 62px);
+        font-weight: 600;
+        letter-spacing: -0.5px;
+        color: var(--white);
+        margin-bottom: 18px;
+        line-height: 1.08;
+      }
+      .cta-title em {
+        font-style: italic;
+        color: var(--gold-bright);
+      }
+      .cta-sub {
+        font-size: 16px;
+        color: var(--w55);
+        max-width: 500px;
+        margin: 0 auto 42px;
+        line-height: 1.8;
+      }
+      .cta-btns {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
+      /* ═══════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════ */
+      .footer {
+        background: var(--dark2);
+        border-top: 1px solid var(--border);
+        padding: 60px 0 28px;
+      }
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 48px;
+        margin-bottom: 48px;
+      }
+      .footer-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .footer-logo-mark {
+        width: 36px;
+        height: 36px;
+        background: var(--gold);
+        border-radius: var(--r-xs);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        color: #fff;
+      }
+      .footer-logo-name {
+        font-family: var(--ff-display);
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--white);
+      }
+      .footer-logo-name span {
+        font-style: italic;
+        color: var(--gold-bright);
+      }
+      .footer-tagline {
+        font-size: 13.5px;
+        color: var(--w35);
+        line-height: 1.7;
+        max-width: 270px;
+        margin-bottom: 22px;
+      }
+      .footer-contact {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 22px;
+      }
+      .footer-contact-item {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 13px;
+        color: var(--w50);
+      }
+      .footer-contact-item i {
+        color: var(--gold);
+        font-size: 12px;
+        width: 14px;
+      }
+      .footer-social {
+        display: flex;
+        gap: 8px;
+      }
+      .footer-soc {
+        width: 34px;
+        height: 34px;
+        background: var(--w05);
+        border: 1px solid var(--border);
+        border-radius: var(--r-xs);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--w35);
+        font-size: 13px;
+        transition: all 0.2s;
+      }
+      .footer-soc:hover {
+        background: var(--gold-dim);
+        border-color: rgba(201, 146, 42, 0.3);
+        color: var(--gold-bright);
+      }
+      .footer-col-head {
+        font-size: 10.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: var(--w35);
+        margin-bottom: 18px;
+      }
+      .footer-links {
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+      }
+      .footer-lnk {
+        font-size: 13.5px;
+        color: var(--w50);
+        transition: color 0.18s;
+      }
+      .footer-lnk:hover {
+        color: var(--white);
+      }
+      .footer-bottom {
+        border-top: 1px solid var(--border);
+        padding-top: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .footer-copy {
+        font-size: 12.5px;
+        color: var(--w35);
+      }
+      .footer-copy span {
+        color: var(--gold-bright);
+      }
+      .footer-built {
+        font-size: 12px;
+        color: var(--w35);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .footer-built i {
+        color: var(--red);
+      }
+
+      /* ═══════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════ */
+      @media (max-width: 1024px) {
+        .hero-inner {
+          grid-template-columns: 1fr;
+          text-align: center;
+          padding-top: 110px;
+          gap: 50px;
+        }
+        .hero-desc {
+          max-width: 100%;
+        }
+        .hero-cta {
+          justify-content: center;
+        }
+        .hero-badges {
+          margin: 0 auto;
+        }
+        .hero-visual {
+          display: none;
+        }
+        .welcome-grid {
+          grid-template-columns: 1fr;
+          gap: 48px;
+        }
+        .welcome-visual {
+          grid-template-columns: 1fr 1fr;
+        }
+        .offerings-intro {
+          grid-template-columns: 1fr;
+          gap: 24px;
+        }
+        .trainers-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .footer-grid {
+          grid-template-columns: 1fr 1fr;
+          gap: 36px;
+        }
+      }
+      @media (max-width: 768px) {
+        .nav-links,
+        .nav-actions {
+          display: none;
+        }
+        .nav-hamburger {
+          display: flex;
+        }
+        .offerings-grid {
+          grid-template-columns: 1fr;
+        }
+        .plans-grid {
+          grid-template-columns: 1fr;
+        }
+        .join-grid {
+          grid-template-columns: 1fr;
+        }
+        .testi-grid {
+          grid-template-columns: 1fr;
+        }
+        .trainers-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .footer-grid {
+          grid-template-columns: 1fr;
+          gap: 30px;
+        }
+        .cta-box {
+          padding: 48px 24px;
+        }
+        .section {
+          padding: 68px 0;
+        }
+        .hero-badges {
+          flex-direction: column;
+          border-radius: var(--r-md);
+          width: 100%;
+          max-width: 340px;
+        }
+        .hero-badge-item {
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+        }
+        .hero-badge-item:last-child {
+          border-bottom: none;
+        }
+      }
+      @media (max-width: 480px) {
+        .hero-cta {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .hero-cta .btn {
+          justify-content: center;
+        }
+        .cta-btns {
+          flex-direction: column;
+          align-items: center;
+        }
+        .welcome-visual {
+          grid-template-columns: 1fr;
+        }
+        .trainers-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ══════════════════════════════════════════
+     NAV
+══════════════════════════════════════════ -->
+    <nav class="nav">
+      <div class="container">
+        <div class="nav-inner">
+          <a href="index.html" class="nav-logo">
+            <div class="nav-logo-mark">
+              <i class="fa-solid fa-dumbbell"></i>
+            </div>
+            <div>
+              <div class="nav-logo-text">Peak<span>Fit</span> Gym</div>
+              <div class="nav-logo-sub">Premium Fitness Center</div>
+            </div>
+          </a>
+          <div class="nav-links">
+            <a href="#about" class="nav-link">About Us</a>
+            <a href="#offerings" class="nav-link">What We Offer</a>
+            <a href="#membership" class="nav-link">Membership</a>
+            <a href="#trainers" class="nav-link">Our Trainers</a>
+            <a href="#join" class="nav-link">Join Us</a>
+          </div>
+          <div class="nav-divider"></div>
+          <div class="nav-actions">
+            <a href="login.html" class="btn btn-outline btn-sm">Member Login</a>
+            <a href="register.html" class="btn btn-gold btn-sm">Join PeakFit</a>
+          </div>
+          <button class="nav-hamburger" aria-label="Menu">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+    <div class="hero-wrap">
+      <div class="hero-grid-bg"></div>
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+
+      <div class="hero-inner">
+        <!-- LEFT: Text -->
+        <div>
+          <div class="hero-eyebrow fu">
+            <span class="eyebrow-dot"></span>
+            Now Open &nbsp;·&nbsp; Memberships Available
+          </div>
+
+          <h1 class="hero-title fu-1">
+            Where Your
+            <em>Best Self</em>
+            <span class="hero-title-line2">Begins.</span>
+          </h1>
+
+          <p class="hero-desc fu-2">
+            PeakFit Gym is a premium fitness center built for people who take
+            their health seriously. Whether you're just starting your journey or
+            training at an elite level, our world-class facilities, expert
+            trainers, and welcoming community are here to support every step of
+            the way.
+          </p>
+
+          <div class="hero-cta fu-3">
+            <a href="register.html" class="btn btn-gold btn-lg">
+              <i class="fa-solid fa-arrow-right"></i> Join PeakFit Today
+            </a>
+            <a href="#about" class="btn btn-outline btn-lg">
+              <i class="fa-regular fa-circle-play"></i> Discover the Gym
+            </a>
+          </div>
+
+          <div class="hero-badges fu-4">
+            <div class="hero-badge-item">
+              <i class="fa-solid fa-shield-halved"></i> Safe &amp; Clean
+              Facility
+            </div>
+            <div class="hero-badge-item">
+              <i class="fa-solid fa-certificate"></i> Certified Trainers
+            </div>
+            <div class="hero-badge-item">
+              <i class="fa-solid fa-clock"></i> Open 7 Days a Week
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Gym Visual -->
+        <div class="hero-visual fi">
+          <div class="gym-scene">
+            <div class="g-ring g-ring-1"></div>
+            <div class="g-ring g-ring-2"></div>
+            <div class="g-ring g-ring-3"></div>
+            <div class="g-glow"></div>
+
+            <!-- Dumbbell SVG -->
+            <div class="dumbbell-wrap">
+              <svg
+                class="dumbbell-svg"
+                viewBox="0 0 220 100"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x="60"
+                  y="45"
+                  width="100"
+                  height="10"
+                  rx="5"
+                  fill="url(#bG)"
+                />
+                <rect
+                  x="18"
+                  y="26"
+                  width="44"
+                  height="48"
+                  rx="8"
+                  fill="url(#pG)"
+                />
+                <rect
+                  x="26"
+                  y="33"
+                  width="28"
+                  height="34"
+                  rx="5"
+                  fill="url(#pI)"
+                />
+                <circle cx="40" cy="50" r="4.5" fill="#c9922a" opacity=".7" />
+                <rect
+                  x="158"
+                  y="26"
+                  width="44"
+                  height="48"
+                  rx="8"
+                  fill="url(#pG)"
+                />
+                <rect
+                  x="166"
+                  y="33"
+                  width="28"
+                  height="34"
+                  rx="5"
+                  fill="url(#pI)"
+                />
+                <circle cx="180" cy="50" r="4.5" fill="#c9922a" opacity=".7" />
+                <rect
+                  x="60"
+                  y="45"
+                  width="100"
+                  height="3"
+                  rx="1.5"
+                  fill="rgba(255,255,255,0.14)"
+                />
+                <line
+                  x1="92"
+                  y1="46"
+                  x2="92"
+                  y2="54"
+                  stroke="rgba(0,0,0,0.25)"
+                  stroke-width="1.5"
+                />
+                <line
+                  x1="104"
+                  y1="46"
+                  x2="104"
+                  y2="54"
+                  stroke="rgba(0,0,0,0.25)"
+                  stroke-width="1.5"
+                />
+                <line
+                  x1="116"
+                  y1="46"
+                  x2="116"
+                  y2="54"
+                  stroke="rgba(0,0,0,0.25)"
+                  stroke-width="1.5"
+                />
+                <line
+                  x1="128"
+                  y1="46"
+                  x2="128"
+                  y2="54"
+                  stroke="rgba(0,0,0,0.25)"
+                  stroke-width="1.5"
+                />
+                <defs>
+                  <linearGradient id="bG" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#c8c8c8" />
+                    <stop offset="100%" stop-color="#787878" />
+                  </linearGradient>
+                  <linearGradient id="pG" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#c9922a" />
+                    <stop offset="100%" stop-color="#8a5c0a" />
+                  </linearGradient>
+                  <linearGradient id="pI" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#e0a83a" />
+                    <stop offset="100%" stop-color="#b07418" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+
+            <!-- Floating cards -->
+            <div class="sc sc-1">
+              <div class="sc-label">Active Members</div>
+              <div class="sc-val" style="color: var(--gold-bright)">248</div>
+              <div class="sc-sub">↑ Growing every week</div>
+              <div class="mini-bars">
+                <div class="mb" style="height: 38%"></div>
+                <div class="mb" style="height: 58%"></div>
+                <div class="mb" style="height: 44%"></div>
+                <div class="mb" style="height: 72%"></div>
+                <div class="mb" style="height: 54%"></div>
+                <div class="mb hi" style="height: 92%"></div>
+              </div>
+            </div>
+
+            <div class="sc sc-2">
+              <div class="sc-label">Member Satisfaction</div>
+              <div class="sc-val" style="color: var(--teal)">98%</div>
+              <div class="sc-sub" style="color: var(--teal)">
+                Highly rated facility
+              </div>
+              <div class="hb-line">
+                <svg width="80" height="22" viewBox="0 0 80 22">
+                  <polyline
+                    points="0,11 12,11 18,3 24,19 30,11 40,11 46,5 50,17 56,11 80,11"
+                    fill="none"
+                    stroke="#1ec99a"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            <div class="sc sc-3">
+              <div class="sc-label">Weekly Classes</div>
+              <div class="sc-val" style="color: var(--gold-bright)">40+</div>
+              <div class="sc-sub">Yoga · Strength · Cardio</div>
+            </div>
+
+            <div class="sc sc-4">
+              <div class="sc-label">Expert Trainers</div>
+              <div class="sc-val" style="color: var(--purple)">12</div>
+              <div class="sc-sub">Certified professionals</div>
+            </div>
+          </div>
+          <!-- /gym-scene -->
+        </div>
+        <!-- /hero-visual -->
+      </div>
+    </div>
+    <!-- /hero-wrap -->
+
+    <!-- ══════════════════════════════════════════
+     TICKER
+══════════════════════════════════════════ -->
+    <div class="ticker-wrap">
+      <div class="ticker-track">
+        <span class="ticker-item"
+          ><i class="fa-solid fa-dumbbell"></i> Strength Training</span
+        ><span class="ticker-sep">·</span>
+        <span class="ticker-item"
+          ><i class="fa-solid fa-person-running"></i> Cardio Fitness</span
+        ><span class="ticker-sep">·</span>
+        <span class="ticker-item"
+          ><i class="fa-solid fa-spa"></i> Yoga &amp; Pilates</span
+        ><span class="ticker-sep">·</span>
+        <span class="ticker-item"
+          ><i class="fa-solid fa-users"></i> Group Classes</span
+        ><span class="ticker-sep">·</span>
+        <span class="ticker-item"
+          ><i class="fa-solid fa-user-tie"></i> Personal Training</span
+        ><span class="ticker-sep">·</span>
+        <span class="ticker-item"
+          ><i class="fa-solid fa-apple-whole"></i> Nutrition Guidance</span
+        ><span class="ticker-sep">·</span>
+        <span class="ticker-item"
+          ><i class="fa-solid fa-award"></i> Certified Trainers</span
+        ><span class="ticker-sep">·</span>
+        <span class="ticker-item"
+          ><i class="fa-solid fa-heart-pulse"></i> Wellness Programs</span
+        ><span class="ticker-sep">·</span>
+        <!-- duplicate -->
+        <span class="ticker-item"
+          ><i class="fa-solid fa-dumbbell"></i> Strength Training</span
+        ><span class="ticker-sep">·</span>
+        <span class="ticker-item"
+          ><i class="fa-solid fa-person-running"></i> Cardio Fitness</span
+        ><span class="ticker-sep">·</span>
+        <span class="ticker-item"
+          ><i class="fa-solid fa-spa"></i> Yoga &amp; Pilates</span
+        ><span class="ticker-sep">·</span>
+        <span class="ticker-item"
+          ><i class="fa-solid fa-users"></i> Group Classes</span
+        ><span class="ticker-sep">·</span>
+        <span class="ticker-item"
+          ><i class="fa-solid fa-user-tie"></i> Personal Training</span
+        ><span class="ticker-sep">·</span>
+        <span class="ticker-item"
+          ><i class="fa-solid fa-apple-whole"></i> Nutrition Guidance</span
+        ><span class="ticker-sep">·</span>
+        <span class="ticker-item"
+          ><i class="fa-solid fa-award"></i> Certified Trainers</span
+        ><span class="ticker-sep">·</span>
+        <span class="ticker-item"
+          ><i class="fa-solid fa-heart-pulse"></i> Wellness Programs</span
+        ><span class="ticker-sep">·</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+     ABOUT / WELCOME
+══════════════════════════════════════════ -->
+    <section class="section section-dark" id="about">
+      <div class="container">
+        <div class="welcome-grid">
+          <div>
+            <div class="ruled-tag"><span>Welcome to PeakFit</span></div>
+            <h2 class="section-heading">
+              More Than a Gym —<br />
+              A <em>Community</em> Built<br />
+              <span class="light">Around Your Goals.</span>
+            </h2>
+            <p class="section-body">
+              At PeakFit Gym, we believe fitness is for everyone. We've created
+              a space where beginners feel comfortable, seasoned athletes find
+              their challenge, and everyone in between discovers what they're
+              truly capable of.
+            </p>
+            <blockquote class="welcome-quote">
+              "Our mission is simple — to give every member the tools, guidance,
+              and environment they need to become the best version of
+              themselves."
+            </blockquote>
+            <p class="section-body">
+              From state-of-the-art equipment and a wide variety of fitness
+              classes, to certified personal trainers and a dedicated management
+              team — PeakFit is committed to making your fitness journey
+              seamless, enjoyable, and effective.
+            </p>
+
+            <div class="welcome-stats">
+              <div class="ws-item">
+                <div class="ws-num">248</div>
+                <div class="ws-label">Active Members</div>
+              </div>
+              <div class="ws-item">
+                <div class="ws-num">12</div>
+                <div class="ws-label">Expert Trainers</div>
+              </div>
+              <div class="ws-item">
+                <div class="ws-num">40+</div>
+                <div class="ws-label">Weekly Classes</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="welcome-visual">
+            <div class="wv-card">
+              <div class="wv-icon gold">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+              <div class="wv-title">Safe &amp; Clean</div>
+              <div class="wv-desc">
+                Maintained to the highest standards of hygiene and safety, every
+                single day.
+              </div>
+            </div>
+            <div class="wv-card">
+              <div class="wv-icon teal"><i class="fa-solid fa-award"></i></div>
+              <div class="wv-title">Certified Staff</div>
+              <div class="wv-desc">
+                Every trainer at PeakFit holds professional fitness
+                certifications and ongoing training.
+              </div>
+            </div>
+            <div class="wv-card">
+              <div class="wv-icon purple">
+                <i class="fa-solid fa-users"></i>
+              </div>
+              <div class="wv-title">Real Community</div>
+              <div class="wv-desc">
+                Join a gym family that motivates, supports, and celebrates every
+                milestone together.
+              </div>
+            </div>
+            <div class="wv-card">
+              <div class="wv-icon red"><i class="fa-solid fa-clock"></i></div>
+              <div class="wv-title">Open Daily</div>
+              <div class="wv-desc">
+                Flexible hours designed around your schedule — early mornings to
+                late evenings, every day.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+     WHAT WE OFFER
+══════════════════════════════════════════ -->
+    <section class="section section-black" id="offerings">
+      <div class="container">
+        <div class="offerings-intro">
+          <div>
+            <div class="ruled-tag"><span>What We Offer</span></div>
+            <h2 class="section-heading">
+              Everything You Need<br />
+              <em>Under One Roof</em>
+            </h2>
+          </div>
+          <p class="section-body" style="align-self: end">
+            PeakFit is equipped with a full range of facilities and programs
+            designed to support every aspect of your fitness — from strength and
+            cardio to flexibility and recovery.
+          </p>
+        </div>
+
+        <div class="offerings-grid">
+          <div class="offer-card c-gold">
+            <div class="offer-number">01</div>
+            <div class="offer-icon gold">
+              <i class="fa-solid fa-dumbbell"></i>
+            </div>
+            <h3 class="offer-title">Strength &amp; Weight Training</h3>
+            <p class="offer-desc">
+              A fully equipped weights floor featuring free weights, resistance
+              machines, and dedicated lifting platforms for all fitness levels.
+            </p>
+          </div>
+          <div class="offer-card c-teal">
+            <div class="offer-number">02</div>
+            <div class="offer-icon teal">
+              <i class="fa-solid fa-person-running"></i>
+            </div>
+            <h3 class="offer-title">Cardio &amp; Endurance</h3>
+            <p class="offer-desc">
+              Modern treadmills, rowing machines, cycling stations, and
+              ellipticals to power your cardiovascular fitness goals.
+            </p>
+          </div>
+          <div class="offer-card c-purple">
+            <div class="offer-number">03</div>
+            <div class="offer-icon purple">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <h3 class="offer-title">Group Fitness Classes</h3>
+            <p class="offer-desc">
+              High-energy group sessions including aerobics, Zumba, HIIT, and
+              spin classes led by motivating certified instructors.
+            </p>
+          </div>
+          <div class="offer-card c-blue">
+            <div class="offer-number">04</div>
+            <div class="offer-icon blue"><i class="fa-solid fa-spa"></i></div>
+            <h3 class="offer-title">Yoga &amp; Pilates</h3>
+            <p class="offer-desc">
+              Dedicated studio sessions for yoga, pilates, and mindful movement
+              — the perfect complement to any training programme.
+            </p>
+          </div>
+          <div class="offer-card c-amber">
+            <div class="offer-number">05</div>
+            <div class="offer-icon amber">
+              <i class="fa-solid fa-user-tie"></i>
+            </div>
+            <h3 class="offer-title">Personal Training</h3>
+            <p class="offer-desc">
+              One-on-one sessions with a dedicated trainer who creates a
+              personalised programme tailored specifically to your goals.
+            </p>
+          </div>
+          <div class="offer-card c-red">
+            <div class="offer-number">06</div>
+            <div class="offer-icon red">
+              <i class="fa-solid fa-apple-whole"></i>
+            </div>
+            <h3 class="offer-title">Nutrition &amp; Wellness</h3>
+            <p class="offer-desc">
+              Guidance from fitness professionals on nutrition, recovery, and
+              lifestyle habits to support your progress inside and outside the
+              gym.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+     MEMBERSHIP PLANS
+══════════════════════════════════════════ -->
+    <section class="section section-dark" id="membership">
+      <div class="container">
+        <div style="text-align: center; max-width: 560px; margin: 0 auto">
+          <div class="ruled-tag" style="justify-content: center">
+            <span>Membership Plans</span>
+          </div>
+          <h2 class="section-heading">
+            Choose the Plan<br /><em>That Fits Your Life</em>
+          </h2>
+          <p class="section-body" style="margin: 0 auto">
+            Flexible membership options designed to suit every lifestyle and
+            budget. No hidden fees — just straightforward access to everything
+            PeakFit has to offer.
+          </p>
+        </div>
+
+        <div class="plans-grid">
+          <!-- Basic -->
+          <div class="plan-card">
+            <div class="plan-head">
+              <div class="plan-name">Basic</div>
+              <div class="plan-tagline">Perfect for getting started</div>
+              <div class="plan-price">₦8,000 <span>/ month</span></div>
+            </div>
+            <div class="plan-body">
+              <ul class="plan-features">
+                <li class="plan-feat">
+                  <i class="fa-solid fa-check"></i> Full gym floor access
+                </li>
+                <li class="plan-feat">
+                  <i class="fa-solid fa-check"></i> Cardio equipment
+                </li>
+                <li class="plan-feat">
+                  <i class="fa-solid fa-check"></i> Locker room access
+                </li>
+                <li class="plan-feat dim">
+                  <i class="fa-solid fa-xmark"></i> Group fitness classes
+                </li>
+                <li class="plan-feat dim">
+                  <i class="fa-solid fa-xmark"></i> Personal training sessions
+                </li>
+                <li class="plan-feat dim">
+                  <i class="fa-solid fa-xmark"></i> Nutrition guidance
+                </li>
+              </ul>
+              <a
+                href="register.html"
+                class="btn btn-outline-gold btn-sm"
+                style="width: 100%; justify-content: center"
+              >
+                <i class="fa-solid fa-arrow-right"></i> Get Started
+              </a>
+            </div>
+          </div>
+
+          <!-- Premium — Featured -->
+          <div class="plan-card featured">
+            <div class="plan-featured-badge">Most Popular</div>
+            <div class="plan-head featured-head">
+              <div class="plan-name">Premium</div>
+              <div class="plan-tagline">Our most popular membership</div>
+              <div class="plan-price">₦15,000 <span>/ month</span></div>
+            </div>
+            <div class="plan-body">
+              <ul class="plan-features">
+                <li class="plan-feat">
+                  <i class="fa-solid fa-check"></i> Full gym floor access
+                </li>
+                <li class="plan-feat">
+                  <i class="fa-solid fa-check"></i> Cardio equipment
+                </li>
+                <li class="plan-feat">
+                  <i class="fa-solid fa-check"></i> Locker room access
+                </li>
+                <li class="plan-feat">
+                  <i class="fa-solid fa-check"></i> All group fitness classes
+                </li>
+                <li class="plan-feat">
+                  <i class="fa-solid fa-check"></i> 2 personal training sessions
+                </li>
+                <li class="plan-feat dim">
+                  <i class="fa-solid fa-xmark"></i> Nutrition guidance
+                </li>
+              </ul>
+              <a
+                href="register.html"
+                class="btn btn-gold btn-sm"
+                style="width: 100%; justify-content: center"
+              >
+                <i class="fa-solid fa-arrow-right"></i> Join Premium
+              </a>
+            </div>
+          </div>
+
+          <!-- Elite -->
+          <div class="plan-card">
+            <div class="plan-head">
+              <div class="plan-name">Elite</div>
+              <div class="plan-tagline">The complete fitness experience</div>
+              <div class="plan-price">₦25,000 <span>/ month</span></div>
+            </div>
+            <div class="plan-body">
+              <ul class="plan-features">
+                <li class="plan-feat">
+                  <i class="fa-solid fa-check"></i> Full gym floor access
+                </li>
+                <li class="plan-feat">
+                  <i class="fa-solid fa-check"></i> Cardio equipment
+                </li>
+                <li class="plan-feat">
+                  <i class="fa-solid fa-check"></i> Locker room access
+                </li>
+                <li class="plan-feat">
+                  <i class="fa-solid fa-check"></i> All group fitness classes
+                </li>
+                <li class="plan-feat">
+                  <i class="fa-solid fa-check"></i> Unlimited personal training
+                </li>
+                <li class="plan-feat">
+                  <i class="fa-solid fa-check"></i> Full nutrition guidance
+                </li>
+              </ul>
+              <a
+                href="register.html"
+                class="btn btn-outline-gold btn-sm"
+                style="width: 100%; justify-content: center"
+              >
+                <i class="fa-solid fa-arrow-right"></i> Go Elite
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+     MEET THE TRAINERS
+══════════════════════════════════════════ -->
+    <section class="section section-black" id="trainers">
+      <div class="container">
+        <div style="text-align: center; max-width: 520px; margin: 0 auto">
+          <div class="ruled-tag" style="justify-content: center">
+            <span>Our Trainers</span>
+          </div>
+          <h2 class="section-heading">
+            Expert Coaches,<br /><em>Real Results</em>
+          </h2>
+          <p class="section-body" style="margin: 0 auto">
+            Our team of certified fitness professionals is dedicated to helping
+            you hit every goal — with personalised guidance, encouragement, and
+            expertise.
+          </p>
+        </div>
+
+        <div class="trainers-grid">
+          <div class="trainer-card">
+            <div class="trainer-avatar ta-1">
+              <div class="trainer-avatar-bg"></div>
+              <div class="trainer-initials" style="color: var(--gold-bright)">
+                AK
+              </div>
+            </div>
+            <div class="trainer-info">
+              <div class="trainer-name">Aminu Kano</div>
+              <div class="trainer-role">Head Trainer</div>
+              <div class="trainer-spec">
+                Strength &amp; conditioning specialist with 8 years of
+                professional coaching experience.
+              </div>
+            </div>
+          </div>
+          <div class="trainer-card">
+            <div class="trainer-avatar ta-2">
+              <div class="trainer-avatar-bg"></div>
+              <div class="trainer-initials" style="color: var(--teal)">FO</div>
+            </div>
+            <div class="trainer-info">
+              <div class="trainer-name">Fatima Okonkwo</div>
+              <div class="trainer-role">Yoga &amp; Wellness Coach</div>
+              <div class="trainer-spec">
+                Certified yoga instructor and wellness consultant focused on
+                mind-body balance.
+              </div>
+            </div>
+          </div>
+          <div class="trainer-card">
+            <div class="trainer-avatar ta-3">
+              <div class="trainer-avatar-bg"></div>
+              <div class="trainer-initials" style="color: var(--purple)">
+                DM
+              </div>
+            </div>
+            <div class="trainer-info">
+              <div class="trainer-name">Daniel Musa</div>
+              <div class="trainer-role">Cardio &amp; HIIT Coach</div>
+              <div class="trainer-spec">
+                High-intensity training expert helping members push their
+                cardiovascular limits safely.
+              </div>
+            </div>
+          </div>
+          <div class="trainer-card">
+            <div class="trainer-avatar ta-4">
+              <div class="trainer-avatar-bg"></div>
+              <div class="trainer-initials" style="color: var(--red)">CA</div>
+            </div>
+            <div class="trainer-info">
+              <div class="trainer-name">Chioma Adeyemi</div>
+              <div class="trainer-role">Nutrition &amp; Lifestyle Coach</div>
+              <div class="trainer-spec">
+                Dedicated to helping members build sustainable nutrition habits
+                that support their training.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+     HOW TO JOIN
+══════════════════════════════════════════ -->
+    <section class="section section-dark" id="join">
+      <div class="container">
+        <div style="text-align: center; max-width: 540px; margin: 0 auto">
+          <div class="ruled-tag" style="justify-content: center">
+            <span>How to Join</span>
+          </div>
+          <h2 class="section-heading">
+            Start Your Journey<br /><em>in Three Simple Steps</em>
+          </h2>
+          <p class="section-body" style="margin: 0 auto">
+            Becoming a PeakFit member is straightforward. Register online,
+            choose your plan, and walk through our doors ready to train.
+          </p>
+        </div>
+
+        <div class="join-grid">
+          <div class="join-step">
+            <span class="join-step-num">01</span>
+            <div class="join-icon"><i class="fa-solid fa-user-plus"></i></div>
+            <h3 class="join-title">Create Your Account</h3>
+            <p class="join-desc">
+              Register online in minutes. Fill in your personal details, choose
+              your membership plan, and set up your member profile to get
+              started.
+            </p>
+          </div>
+          <div class="join-step">
+            <span class="join-step-num">02</span>
+            <div class="join-icon"><i class="fa-solid fa-id-card"></i></div>
+            <h3 class="join-title">Get Your Member Access</h3>
+            <p class="join-desc">
+              Once registered, you'll receive access to your personal member
+              dashboard — where you can view your schedule, track attendance,
+              and manage your membership.
+            </p>
+          </div>
+          <div class="join-step">
+            <span class="join-step-num">03</span>
+            <div class="join-icon"><i class="fa-solid fa-dumbbell"></i></div>
+            <h3 class="join-title">Start Training</h3>
+            <p class="join-desc">
+              Walk through our doors, meet your trainer, join a class, or hit
+              the floor solo. Your PeakFit journey starts the moment you arrive.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+     TESTIMONIALS
+══════════════════════════════════════════ -->
+    <section class="section section-black">
+      <div class="container">
+        <div style="text-align: center; max-width: 500px; margin: 0 auto">
+          <div class="ruled-tag" style="justify-content: center">
+            <span>Member Stories</span>
+          </div>
+          <h2 class="section-heading">
+            Hear It From<br /><em>Our Members</em>
+          </h2>
+        </div>
+
+        <div class="testi-grid">
+          <div class="testi-card">
+            <div class="testi-stars">
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i
+              ><i class="fa-solid fa-star"></i>
+            </div>
+            <p class="testi-text">
+              "I've been a PeakFit member for six months and it's completely
+              changed how I feel. The trainers actually care about your progress
+              — it's not just a gym, it's a community."
+            </p>
+            <div class="testi-author">
+              <div class="testi-av av-g">B</div>
+              <div>
+                <div class="testi-name">Blessing Okafor</div>
+                <div class="testi-role">Premium Member · 6 months</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="testi-card">
+            <div class="testi-stars">
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i
+              ><i class="fa-solid fa-star"></i>
+            </div>
+            <p class="testi-text">
+              "The facilities are excellent — clean, well-maintained, and never
+              overcrowded. My trainer Daniel has helped me drop 12kg in four
+              months. I recommend PeakFit to everyone."
+            </p>
+            <div class="testi-author">
+              <div class="testi-av av-t">T</div>
+              <div>
+                <div class="testi-name">Taiwo Adeleke</div>
+                <div class="testi-role">Elite Member · 4 months</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="testi-card">
+            <div class="testi-stars">
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+              <i class="fa-regular fa-star"></i>
+            </div>
+            <p class="testi-text">
+              "I was nervous to join a gym for the first time, but PeakFit made
+              me feel so welcome from day one. The yoga classes with Fatima are
+              my absolute favourite part of the week."
+            </p>
+            <div class="testi-author">
+              <div class="testi-av av-p">N</div>
+              <div>
+                <div class="testi-name">Ngozi Chukwu</div>
+                <div class="testi-role">Basic Member · 3 months</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+     CTA
+══════════════════════════════════════════ -->
+    <section class="cta-section">
+      <div class="container">
+        <div class="cta-box">
+          <h2 class="cta-title">
+            Ready to Start Your<br />
+            <em>Fitness Journey?</em>
+          </h2>
+          <p class="cta-sub">
+            Join hundreds of members who have already made PeakFit their fitness
+            home. Sign up today and take the first step toward a stronger,
+            healthier you.
+          </p>
+          <div class="cta-btns">
+            <a href="register.html" class="btn btn-gold btn-lg">
+              <i class="fa-solid fa-arrow-right"></i> Join PeakFit Today
+            </a>
+            <a href="login.html" class="btn btn-outline btn-lg">
+              <i class="fa-solid fa-gauge-high"></i> Member Login
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <div class="footer-logo">
+              <div class="footer-logo-mark">
+                <i class="fa-solid fa-dumbbell"></i>
+              </div>
+              <div class="footer-logo-name">Peak<span>Fit</span> Gym</div>
+            </div>
+            <p class="footer-tagline">
+              A premium fitness center dedicated to helping you become the best
+              version of yourself — every single day.
+            </p>
+            <div class="footer-contact">
+              <div class="footer-contact-item">
+                <i class="fa-solid fa-location-dot"></i> 12 Fitness Avenue,
+                Lagos, Nigeria
+              </div>
+              <div class="footer-contact-item">
+                <i class="fa-solid fa-phone"></i> +234 800 123 4567
+              </div>
+              <div class="footer-contact-item">
+                <i class="fa-solid fa-envelope"></i> hello@peakfitgym.com
+              </div>
+              <div class="footer-contact-item">
+                <i class="fa-solid fa-clock"></i> Mon – Sun: 5:00 AM – 11:00 PM
+              </div>
+            </div>
+            <div class="footer-social">
+              <a href="#" class="footer-soc"
+                ><i class="fa-brands fa-instagram"></i
+              ></a>
+              <a href="#" class="footer-soc"
+                ><i class="fa-brands fa-twitter"></i
+              ></a>
+              <a href="#" class="footer-soc"
+                ><i class="fa-brands fa-facebook-f"></i
+              ></a>
+              <a href="#" class="footer-soc"
+                ><i class="fa-brands fa-tiktok"></i
+              ></a>
+            </div>
+          </div>
+
+          <div>
+            <div class="footer-col-head">Quick Links</div>
+            <div class="footer-links">
+              <a href="#about" class="footer-lnk">About PeakFit</a>
+              <a href="#offerings" class="footer-lnk">What We Offer</a>
+              <a href="#membership" class="footer-lnk">Membership Plans</a>
+              <a href="#trainers" class="footer-lnk">Our Trainers</a>
+              <a href="#join" class="footer-lnk">How to Join</a>
+            </div>
+          </div>
+
+          <div>
+            <div class="footer-col-head">Member Portal</div>
+            <div class="footer-links">
+              <a href="login.html" class="footer-lnk">Member Login</a>
+              <a href="register.html" class="footer-lnk">Register</a>
+              <a href="member-dashboard.html" class="footer-lnk"
+                >My Dashboard</a
+              >
+              <a href="classes.html" class="footer-lnk">Class Schedule</a>
+              <a href="attendance.html" class="footer-lnk">My Attendance</a>
+              <a href="payments.html" class="footer-lnk">Payment History</a>
+            </div>
+          </div>
+
+          <div>
+            <div class="footer-col-head">Our Programs</div>
+            <div class="footer-links">
+              <a href="#" class="footer-lnk">Strength Training</a>
+              <a href="#" class="footer-lnk">Cardio Fitness</a>
+              <a href="#" class="footer-lnk">Yoga &amp; Pilates</a>
+              <a href="#" class="footer-lnk">Group Classes</a>
+              <a href="#" class="footer-lnk">Personal Training</a>
+              <a href="#" class="footer-lnk">Nutrition Coaching</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p class="footer-copy">
+            &copy; 2026 <span>PeakFit Gym</span>. All rights reserved.
+          </p>
+          <p class="footer-built">
+            Made with <i class="fa-solid fa-heart"></i> for our members
+          </p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
