@@ -1,35 +1,23 @@
+// LOGIN.JS - Complete Fixed Version
 // ============================================
-// FIXED: Only redirect if we're coming from another page
+
 // ============================================
+// SECURITY: Only redirect if already logged in AND on login page
+// ============================================
+
 let alreadyLoggedIn = JSON.parse(localStorage.getItem("currentUser"));
 
-// ONLY redirect if user is already logged in AND we're NOT on login page
-// This prevents the login page itself from redirecting
-if (
-  alreadyLoggedIn &&
-  window.location.pathname.includes("login.html") === false
-) {
-  if (alreadyLoggedIn.role === "admin") {
-    window.location.href = "admin-dashboard.html";
-  } else if (alreadyLoggedIn.role === "trainer") {
-    window.location.href = "trainer-dashboard.html";
-  } else if (alreadyLoggedIn.role === "member") {
-    window.location.href = "member-dashboard.html";
-  }
-  throw new Error("Already logged in");
-}
-
-// If we ARE on login page and user is logged in, clear it (fresh login)
+// IMPORTANT FIX: Only redirect if user is logged in AND we're on login page
+// This prevents infinite loops
 if (alreadyLoggedIn && window.location.pathname.includes("login.html")) {
-  // Optional: Clear auto-login for fresh session
-  // Comment this out if you want to keep auto-redirect
+  // Clear the stored user to allow fresh login
+  // This ensures the login page shows properly
   localStorage.removeItem("currentUser");
+  localStorage.removeItem("currentMember");
+  alreadyLoggedIn = null;
 }
 
-// ============================================
-// REST OF YOUR EXISTING CODE (keep everything below)
-// ============================================
-
+// Rest of your code starts here
 let roleText = document.getElementById("roleBannerText");
 let adminDetails = [];
 let selectedRole = "member";
@@ -49,9 +37,6 @@ if (!localStorage.getItem("adminDetails")) {
   adminInfo();
 }
 
-// ... KEEP ALL YOUR EXISTING CODE FROM HERE ...
-// (roleSelector, validateFields, login, etc. - everything you already have)
-
 // ============================================
 // ROLE SELECTOR - UPDATED WITH FULL UI
 // ============================================
@@ -60,7 +45,8 @@ const roleSelector = (role) => {
   selectedRole = role;
 
   // Update hidden input
-  document.getElementById("selectedRole").value = role;
+  let selectedRoleInput = document.getElementById("selectedRole");
+  if (selectedRoleInput) selectedRoleInput.value = role;
 
   // Get DOM elements
   let tabMember = document.getElementById("tabMember");
@@ -72,51 +58,65 @@ const roleSelector = (role) => {
   let registerLink = document.getElementById("registerLink");
   let loginForm = document.getElementById("loginForm");
 
+  if (!tabMember || !tabTrainer || !tabAdmin) return;
+
   // Remove active class from all tabs
   tabMember.classList.remove("active");
   tabTrainer.classList.remove("active");
   tabAdmin.classList.remove("active");
 
   // Remove role classes from banner and button
-  roleBanner.classList.remove("member", "trainer", "admin");
-  loginBtn.classList.remove("member", "trainer", "admin");
-  loginForm.classList.remove("role-member", "role-trainer", "role-admin");
+  if (roleBanner) {
+    roleBanner.classList.remove("member", "trainer", "admin");
+  }
+  if (loginBtn) {
+    loginBtn.classList.remove("member", "trainer", "admin");
+  }
+  if (loginForm) {
+    loginForm.classList.remove("role-member", "role-trainer", "role-admin");
+  }
 
   // Apply role-specific styling
   if (role === "member") {
     tabMember.classList.add("active");
-    roleBanner.classList.add("member");
-    loginBtn.classList.add("member");
-    loginForm.classList.add("role-member");
-    roleBanner.innerHTML = `<i class="fa-solid fa-id-card"></i><div class="role-banner-text">Signing in as a <strong>Gym Member</strong> — access your membership, classes &amp; attendance.</div>`;
-    if (loginBtnTextSpan)
+    if (roleBanner) {
+      roleBanner.classList.add("member");
+      roleBanner.innerHTML = `<i class="fa-solid fa-id-card"></i><div class="role-banner-text">Signing in as a <strong>Gym Member</strong> — access your membership, classes &amp; attendance.</div>`;
+    }
+    if (loginBtn) loginBtn.classList.add("member");
+    if (loginForm) loginForm.classList.add("role-member");
+    if (loginBtnTextSpan) {
       loginBtnTextSpan.innerHTML =
         '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In as Member';
-
+    }
     // Show register link only for members
     if (registerLink) registerLink.style.display = "block";
   } else if (role === "trainer") {
     tabTrainer.classList.add("active");
-    roleBanner.classList.add("trainer");
-    loginBtn.classList.add("trainer");
-    loginForm.classList.add("role-trainer");
-    roleBanner.innerHTML = `<i class="fa-solid fa-person-running"></i><div class="role-banner-text">Signing in as a <strong>Gym Trainer</strong> — manage your classes &amp; track attendance.</div>`;
-    if (loginBtnTextSpan)
+    if (roleBanner) {
+      roleBanner.classList.add("trainer");
+      roleBanner.innerHTML = `<i class="fa-solid fa-person-running"></i><div class="role-banner-text">Signing in as a <strong>Gym Trainer</strong> — manage your classes &amp; track attendance.</div>`;
+    }
+    if (loginBtn) loginBtn.classList.add("trainer");
+    if (loginForm) loginForm.classList.add("role-trainer");
+    if (loginBtnTextSpan) {
       loginBtnTextSpan.innerHTML =
         '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In as Trainer';
-
+    }
     // Hide register link for trainers
     if (registerLink) registerLink.style.display = "none";
   } else if (role === "admin") {
     tabAdmin.classList.add("active");
-    roleBanner.classList.add("admin");
-    loginBtn.classList.add("admin");
-    loginForm.classList.add("role-admin");
-    roleBanner.innerHTML = `<i class="fa-solid fa-shield-halved"></i><div class="role-banner-text">Signing in as a <strong>System Admin</strong> — full access to manage gym operations.</div>`;
-    if (loginBtnTextSpan)
+    if (roleBanner) {
+      roleBanner.classList.add("admin");
+      roleBanner.innerHTML = `<i class="fa-solid fa-shield-halved"></i><div class="role-banner-text">Signing in as a <strong>System Admin</strong> — full access to manage gym operations.</div>`;
+    }
+    if (loginBtn) loginBtn.classList.add("admin");
+    if (loginForm) loginForm.classList.add("role-admin");
+    if (loginBtnTextSpan) {
       loginBtnTextSpan.innerHTML =
         '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In as Admin';
-
+    }
     // Hide register link for admins
     if (registerLink) registerLink.style.display = "none";
   }
@@ -137,17 +137,16 @@ const validateFields = () => {
   let usernameError = document.getElementById("usernameError");
   let passwordError = document.getElementById("passwordError");
 
-  // Clear previous errors
-  usernameError.classList.remove("visible");
-  passwordError.classList.remove("visible");
+  if (usernameError) usernameError.classList.remove("visible");
+  if (passwordError) passwordError.classList.remove("visible");
 
   if (!username || username.trim() === "") {
-    usernameError.classList.add("visible");
+    if (usernameError) usernameError.classList.add("visible");
     isValid = false;
   }
 
   if (!password || password.trim() === "") {
-    passwordError.classList.add("visible");
+    if (passwordError) passwordError.classList.add("visible");
     isValid = false;
   }
 
@@ -155,8 +154,10 @@ const validateFields = () => {
 };
 
 const clearFieldErrors = () => {
-  document.getElementById("usernameError")?.classList.remove("visible");
-  document.getElementById("passwordError")?.classList.remove("visible");
+  let usernameError = document.getElementById("usernameError");
+  let passwordError = document.getElementById("passwordError");
+  if (usernameError) usernameError.classList.remove("visible");
+  if (passwordError) passwordError.classList.remove("visible");
 };
 
 const showAlert = (message) => {
@@ -194,7 +195,7 @@ const setLoading = (isLoading) => {
 };
 
 // ============================================
-// LOGIN FUNCTION - COMPLETE
+// LOGIN FUNCTION - COMPLETE FIXED
 // ============================================
 
 function login() {
@@ -209,7 +210,7 @@ function login() {
 
   setLoading(true);
 
-  // Simulate a tiny delay for better UX (optional)
+  // Simulate a tiny delay for better UX
   setTimeout(() => {
     try {
       if (selectedRole === "trainer") {
@@ -338,7 +339,8 @@ const loadRememberedUser = () => {
   let rememberBox = document.getElementById("rememberBox");
 
   if (rememberedUser && rememberBox) {
-    document.getElementById("username").value = rememberedUser;
+    let usernameInput = document.getElementById("username");
+    if (usernameInput) usernameInput.value = rememberedUser;
     rememberBox.classList.add("checked");
   }
 };
@@ -410,15 +412,10 @@ const initLoginPage = () => {
   hideAlert();
   clearFieldErrors();
 
-  // Update active tab styling on page load
-  let activeTab = document.querySelector(".role-tab.active");
-  if (!activeTab) {
-    document.getElementById("tabMember")?.classList.add("active");
-  }
+  // Set default role via hidden input
+  let selectedRoleInput = document.getElementById("selectedRole");
+  if (selectedRoleInput) selectedRoleInput.value = "member";
 };
 
 // Run initialization when DOM is ready
 document.addEventListener("DOMContentLoaded", initLoginPage);
-
-// Also set default role via hidden input
-document.getElementById("selectedRole").value = "member";

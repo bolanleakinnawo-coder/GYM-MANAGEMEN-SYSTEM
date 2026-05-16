@@ -1,3 +1,5 @@
+// ADMIN DASHBOARD JS
+// ============================================
 // STORED DATA
 let allMembers = JSON.parse(localStorage.getItem("memberDetailsArray")) || [];
 let trainerDetails = JSON.parse(localStorage.getItem("TrainerDetails")) || [];
@@ -31,21 +33,17 @@ if (currentUser.role !== "admin") {
   throw new Error("Unauthorized access.");
 }
 
-// Optional: Display admin name in console (for debugging)
 console.log(`✅ Logged in as Admin: ${currentUser.name}`);
 
+// ============================================
+// VARIABLES (REMOVED DUPLICATE currentUser)
+// ============================================
 let type = "";
 let deleteIndex = null;
 let editIndex = null;
 let editClassIndex = null;
 let selectedPlan = "";
 let selectedPlanPrice = "";
-let currentUser = JSON.parse(localStorage.getItem("currentUser"));
-
-// AUTH CHECK
-if (!currentUser || currentUser.role !== "admin") {
-  window.location.href = "login.html";
-}
 
 // REGEX PATTERNS
 let phoneRegex = /^(070|071|080|081|082|090|091)\d{8}$/;
@@ -101,6 +99,8 @@ function showToast(message, isError = false) {
   const toastText = document.getElementById("toastText");
   const toastIcon = document.getElementById("toastIcon");
 
+  if (!toast) return;
+
   toastText.innerText = message;
   if (isError) {
     toast.classList.add("error");
@@ -124,21 +124,31 @@ function showToast(message, isError = false) {
 
 const addMember = () => {
   editIndex = null;
-  document.getElementById("memberModal").classList.add("open");
-  document.getElementById("memberModalTitle").innerHTML =
-    "Add <em>New Member</em>";
-  document.getElementById("saveMemberBtn").innerHTML =
-    '<i class="fa-solid fa-check"></i> Save Member';
+  const modal = document.getElementById("memberModal");
+  if (modal) modal.classList.add("open");
 
-  document.getElementById("mFirstName").value = "";
-  document.getElementById("mLastName").value = "";
-  document.getElementById("mEmail").value = "";
-  document.getElementById("mPhone").value = "";
-  document.getElementById("mTrainer").value = "";
-  document.getElementById("mGender").value = "";
-  document.getElementById("mDob").value = "";
-  document.getElementById("mUsername").value = "";
-  document.getElementById("mPassword").value = "";
+  const title = document.getElementById("memberModalTitle");
+  const saveBtn = document.getElementById("saveMemberBtn");
+  if (title) title.innerHTML = "Add <em>New Member</em>";
+  if (saveBtn)
+    saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save Member';
+
+  // Clear form
+  const fields = [
+    "mFirstName",
+    "mLastName",
+    "mEmail",
+    "mPhone",
+    "mTrainer",
+    "mGender",
+    "mDob",
+    "mUsername",
+    "mPassword",
+  ];
+  fields.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
 
   document
     .querySelectorAll(".form-error")
@@ -146,26 +156,36 @@ const addMember = () => {
 };
 
 const closeModal = () => {
-  document.getElementById("memberModal").classList.remove("open");
+  const modal = document.getElementById("memberModal");
+  if (modal) modal.classList.remove("open");
   editIndex = null;
 };
 
 const addTrainer = () => {
   editIndex = null;
-  document.getElementById("trainerModal").classList.add("open");
-  document.getElementById("trainerModalTitle").innerHTML =
-    "Add <em>New Trainer</em>";
-  document.getElementById("saveTrainerBtn").innerHTML =
-    '<i class="fa-solid fa-check"></i> Save Trainer';
+  const modal = document.getElementById("trainerModal");
+  if (modal) modal.classList.add("open");
 
-  document.getElementById("tFirstName").value = "";
-  document.getElementById("tLastName").value = "";
-  document.getElementById("tEmail").value = "";
-  document.getElementById("tPhone").value = "";
-  document.getElementById("tSpec").value = "";
-  document.getElementById("tUsername").value = "";
-  document.getElementById("tPassword").value = "";
-  document.getElementById("tBio").value = "";
+  const title = document.getElementById("trainerModalTitle");
+  const saveBtn = document.getElementById("saveTrainerBtn");
+  if (title) title.innerHTML = "Add <em>New Trainer</em>";
+  if (saveBtn)
+    saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save Trainer';
+
+  const fields = [
+    "tFirstName",
+    "tLastName",
+    "tEmail",
+    "tPhone",
+    "tSpec",
+    "tUsername",
+    "tPassword",
+    "tBio",
+  ];
+  fields.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
 
   document
     .querySelectorAll(".form-error")
@@ -173,43 +193,56 @@ const addTrainer = () => {
 };
 
 const closeTrainerModal = () => {
-  document.getElementById("trainerModal").classList.remove("open");
+  const modal = document.getElementById("trainerModal");
+  if (modal) modal.classList.remove("open");
   editIndex = null;
 };
 
 const recordPayment = () => {
   editIndex = null;
-  document.getElementById("paymentModal").classList.add("open");
-  document.getElementById("payMember").value = "";
-  document.getElementById("payPlan").value = "";
-  document.getElementById("payMethod").value = "";
-  document.getElementById("payDate").value = new Date()
-    .toISOString()
-    .split("T")[0];
-  document.getElementById("payAmount").value = "";
-  document.getElementById("payNotes").value = "";
+  const modal = document.getElementById("paymentModal");
+  if (modal) modal.classList.add("open");
+
+  const fields = ["payMember", "payPlan", "payMethod", "payAmount", "payNotes"];
+  fields.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+
+  const dateEl = document.getElementById("payDate");
+  if (dateEl) dateEl.value = new Date().toISOString().split("T")[0];
 };
 
 const closeSavePayment = () => {
-  document.getElementById("paymentModal").classList.remove("open");
+  const modal = document.getElementById("paymentModal");
+  if (modal) modal.classList.remove("open");
   editIndex = null;
 };
 
 const addClass = () => {
   editClassIndex = null;
-  document.getElementById("classModal").classList.add("open");
-  document.getElementById("classModalTitle").innerHTML =
-    "Add <em>New Class</em>";
-  document.getElementById("saveClassBtn").innerHTML =
-    '<i class="fa-solid fa-check"></i> Save Class';
+  const modal = document.getElementById("classModal");
+  if (modal) modal.classList.add("open");
 
-  document.getElementById("clsName").value = "";
-  document.getElementById("clsType").value = "";
-  document.getElementById("clsTrainer").value = "";
-  document.getElementById("clsDay").value = "";
-  document.getElementById("clsTime").value = "";
-  document.getElementById("clsDuration").value = "";
-  document.getElementById("clsCapacity").value = "";
+  const title = document.getElementById("classModalTitle");
+  const saveBtn = document.getElementById("saveClassBtn");
+  if (title) title.innerHTML = "Add <em>New Class</em>";
+  if (saveBtn)
+    saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save Class';
+
+  const fields = [
+    "clsName",
+    "clsType",
+    "clsTrainer",
+    "clsDay",
+    "clsTime",
+    "clsDuration",
+    "clsCapacity",
+  ];
+  fields.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
 
   document
     .querySelectorAll(".form-error")
@@ -217,12 +250,14 @@ const addClass = () => {
 };
 
 const closeClassModal = () => {
-  document.getElementById("classModal").classList.remove("open");
+  const modal = document.getElementById("classModal");
+  if (modal) modal.classList.remove("open");
   editClassIndex = null;
 };
 
 const closeDeleteModal = () => {
-  document.getElementById("deleteModal").classList.remove("open");
+  const modal = document.getElementById("deleteModal");
+  if (modal) modal.classList.remove("open");
   deleteIndex = null;
   type = "";
 };
@@ -385,7 +420,7 @@ const loadAdminProfile = () => {
 loadAdminProfile();
 
 // ============================================
-// MEMBER MANAGEMENT
+// MEMBER MANAGEMENT - VALIDATIONS
 // ============================================
 
 const firstNameCheck = () => {
@@ -696,7 +731,7 @@ const displayMembersTable = () => {
                 <button class="tbl-btn tbl-btn-delete" onclick="deleteModal(${realIndex}, 'allMembers')"><i class="fa-solid fa-trash"></i> Delete</button>
                 <button class="tbl-btn tbl-btn-view" onclick="viewMember(${realIndex})"><i class="fa-solid fa-eye"></i> View</button>
             </td>
-        </tr>`;
+        </td>`;
   });
 
   const tbody = document.getElementById("membersTableBody");
@@ -1813,7 +1848,7 @@ const renderAttendanceLog = (data) => {
             <td>${att[2]}</td>
             <td>${dayNames[date.getDay()]}</td>
             <td>${att[4] || "Admin"}</td>
-        </table>`;
+        </td>`;
   });
 
   const tbody = document.getElementById("attLogBody");
