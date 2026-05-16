@@ -1477,6 +1477,7 @@
                     class="form-control"
                     placeholder="e.g. Aminu"
                     autocomplete="given-name"
+                    onblur="firstNameCheck()"
                   />
                 </div>
                 <div class="form-error" id="firstNameError">
@@ -1497,6 +1498,7 @@
                     class="form-control"
                     placeholder="e.g. Kano"
                     autocomplete="family-name"
+                    onblur="lastNameCheck()"
                   />
                 </div>
                 <div class="form-error" id="lastNameError">
@@ -1519,6 +1521,7 @@
                   class="form-control"
                   placeholder="you@example.com"
                   autocomplete="email"
+                  onblur="emailCheck()"
                 />
               </div>
               <div class="form-error" id="emailError">
@@ -1540,6 +1543,7 @@
                   class="form-control"
                   placeholder="+234 800 000 0000"
                   autocomplete="tel"
+                  onblur="phoneCheck()"
                 />
               </div>
               <div class="form-error" id="phoneError">
@@ -1555,7 +1559,13 @@
                 >
                 <div class="input-wrap">
                   <i class="fa-solid fa-cake-candles input-icon"></i>
-                  <input type="date" id="dob" name="dob" class="form-control" />
+                  <input
+                    type="date"
+                    id="dob"
+                    name="dob"
+                    class="form-control"
+                    onblur="dobCheck()"
+                  />
                 </div>
                 <div class="form-error" id="dobError">
                   <i class="fa-solid fa-circle-exclamation"></i> Please enter
@@ -1568,7 +1578,12 @@
                 >
                 <div class="input-wrap">
                   <i class="fa-solid fa-venus-mars input-icon"></i>
-                  <select id="gender" name="gender" class="form-control">
+                  <select
+                    id="gender"
+                    name="gender"
+                    class="form-control"
+                    onblur="genderCheck()"
+                  >
                     <option value="" disabled selected>Select gender</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
@@ -1579,21 +1594,6 @@
                   <i class="fa-solid fa-circle-exclamation"></i> Please select
                   your gender
                 </div>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="address">Home Address</label>
-              <div class="input-wrap">
-                <i class="fa-solid fa-location-dot input-icon"></i>
-                <input
-                  type="text"
-                  id="address"
-                  name="address"
-                  class="form-control"
-                  placeholder="Street, City, State"
-                  autocomplete="street-address"
-                />
               </div>
             </div>
 
@@ -1627,6 +1627,7 @@
                   class="form-control"
                   placeholder="Choose a username"
                   autocomplete="username"
+                  onblur="usernameCheck()"
                 />
               </div>
               <div class="form-hint">
@@ -1651,6 +1652,7 @@
                   class="form-control"
                   placeholder="Create a strong password"
                   autocomplete="new-password"
+                  onblur="passwordCheck()"
                 />
                 <button
                   onclick="showPasswordToogle()"
@@ -1691,6 +1693,7 @@
                   class="form-control"
                   placeholder="Re-enter your password"
                   autocomplete="new-password"
+                  onblur="confirmPasswordCheck()"
                 />
                 <button
                   onclick="showPasswordToogle2()"
@@ -1868,6 +1871,7 @@
                   id="startDate"
                   name="startDate"
                   class="form-control"
+                  onblur="startDateCheck()"
                 />
               </div>
               <div class="form-error" id="startDateError">
@@ -1926,9 +1930,7 @@
           </div>
           <!-- /step3 -->
 
-          <!-- ══════════════════════
-           SUCCESS STATE
-      ══════════════════════ -->
+          <!-- ══════════════════════SUCCESS STATE══════════════════════ -->
           <div class="success-state" id="successState">
             <div class="success-icon"><i class="fa-solid fa-check"></i></div>
             <h2 class="success-title">Welcome to <em>PeakFit!</em></h2>
@@ -1959,17 +1961,18 @@
               </a>
             </div>
           </div>
-
           <!-- Sign in link -->
           <div class="signin-link fu-6" id="signinLink">
             Already a member? <a href="login.html">Sign in here</a>
           </div>
         </div>
+
         <!-- /form-wrap -->
       </div>
       <!-- /right-panel -->
     </div>
     <!-- /page-wrap -->
   </body>
+
   <script src="JS/register.js"></script>
 </html>

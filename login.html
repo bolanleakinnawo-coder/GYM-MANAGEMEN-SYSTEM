@@ -1360,6 +1360,7 @@
           <!-- ── ROLE SELECTOR ── -->
           <div class="role-tabs fu-2" id="roleTabs">
             <div
+              onclick="roleSelector('member')"
               class="role-tab member active"
               id="tabMember"
               data-role="member"
@@ -1371,7 +1372,12 @@
               <div class="role-tab-desc">Gym member portal</div>
             </div>
 
-            <div class="role-tab trainer" id="tabTrainer" data-role="trainer">
+            <div
+              onclick="roleSelector('trainer')"
+              class="role-tab trainer"
+              id="tabTrainer"
+              data-role="trainer"
+            >
               <div class="role-tab-icon">
                 <i class="fa-solid fa-person-running"></i>
               </div>
@@ -1379,7 +1385,12 @@
               <div class="role-tab-desc">Staff access</div>
             </div>
 
-            <div class="role-tab admin" id="tabAdmin" data-role="admin">
+            <div
+              onclick="roleSelector('admin')"
+              class="role-tab admin"
+              id="tabAdmin"
+              data-role="admin"
+            >
               <div class="role-tab-icon">
                 <i class="fa-solid fa-shield-halved"></i>
               </div>

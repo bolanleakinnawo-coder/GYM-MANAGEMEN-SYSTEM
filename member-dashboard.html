@@ -1808,10 +1808,6 @@
       <div class="nav-spacer"></div>
 
       <!-- Notification -->
-      <div class="nav-bell" id="navBell" title="Notifications">
-        <i class="fa-regular fa-bell"></i>
-        <div class="nav-bell-dot" id="navBellDot"></div>
-      </div>
 
       <!-- User pill -->
       <div class="nav-user" id="navUser">
@@ -1836,7 +1832,7 @@
       <button class="tab-btn active" data-tab="overview" id="tabOverview">
         <i class="fa-solid fa-house"></i> Overview
       </button>
-      <button class="tab-btn" data-tab="attendance" id="tabAttendance">
+      <button class="tab-btn active" data-tab="attendance" id="tabAttendance">
         <i class="fa-solid fa-clipboard-check"></i> My Attendance
       </button>
       <button class="tab-btn" data-tab="schedule" id="tabSchedule">
@@ -1991,12 +1987,6 @@
                   >
                   <span class="info-val" id="infoDob">—</span>
                 </div>
-                <div class="info-row">
-                  <span class="info-key"
-                    ><i class="fa-solid fa-location-dot"></i> Address</span
-                  >
-                  <span class="info-val" id="infoAddress">—</span>
-                </div>
               </div>
             </div>
 
@@ -2030,7 +2020,7 @@
         <!-- ════════════════════════════════
          TAB 2 — ATTENDANCE
     ════════════════════════════════ -->
-        <div class="tab-panel" id="panel-attendance">
+        <div class="tab-panel active" id="panel-attendance">
           <div class="panel-header fu">
             <div class="panel-eyebrow">My Record</div>
             <h2 class="panel-title">Attendance <em>History</em></h2>
@@ -2141,8 +2131,7 @@
                     <th>#</th>
                     <th>Date</th>
                     <th>Day</th>
-                    <th>Check-in Time</th>
-                    <th>Check-out Time</th>
+
                     <th>Duration</th>
                     <th>Status</th>
                   </tr>
@@ -2399,19 +2388,6 @@
                   </div>
                 </div>
 
-                <div class="form-group-p">
-                  <label class="form-label-p">Home Address</label>
-                  <div class="input-wrap-p">
-                    <i class="fa-solid fa-location-dot input-icon-p"></i>
-                    <input
-                      type="text"
-                      class="form-input"
-                      id="editAddress"
-                      placeholder="Street, City, State"
-                    />
-                  </div>
-                </div>
-
                 <button
                   class="btn-save"
                   id="savePersonalBtn"
@@ -2558,7 +2534,7 @@
   #toastText          → set message text
 
 ═══════════════════════════════════════ -->
+
+    <script src="JS/member-dashboard.js"></script>
   </body>
-  <script src="JS/login.js"></script>
-  <script src="JS/member-dashboard.js"></script>
 </html>

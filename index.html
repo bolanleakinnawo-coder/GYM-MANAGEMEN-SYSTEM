@@ -16,6 +16,25 @@
     />
 
     <style>
+      /* Add to your existing CSS */
+      .nav-link.active {
+        color: var(--gold-bright);
+        background: var(--gold-dim);
+      }
+
+      .mobile-nav-link.active {
+        color: var(--gold-bright);
+      }
+
+      /* Ensure smooth transitions */
+      .offer-card,
+      .plan-card,
+      .trainer-card,
+      .testi-card,
+      .join-step,
+      .wv-card {
+        transition: all 0.6s var(--ease);
+      }
       /* ═══════════════════════════════════════
        VARIABLES
     ═══════════════════════════════════════ */
@@ -2704,4 +2723,591 @@
       </div>
     </footer>
   </body>
+  <script>
+    // HOMEPAGE JS - PeakFit Gym
+    // ============================================
+
+    // ============================================
+    // MOBILE MENU TOGGLE
+    // ============================================
+
+    const initMobileMenu = () => {
+      const hamburger = document.querySelector(".nav-hamburger");
+      const navLinks = document.querySelector(".nav-links");
+      const navActions = document.querySelector(".nav-actions");
+      const navDivider = document.querySelector(".nav-divider");
+
+      if (!hamburger) return;
+
+      // Create mobile menu container if it doesn't exist
+      let mobileMenu = document.querySelector(".mobile-menu");
+      if (!mobileMenu) {
+        mobileMenu = document.createElement("div");
+        mobileMenu.className = "mobile-menu";
+        mobileMenu.innerHTML = `
+            <div class="mobile-menu-inner">
+                <div class="mobile-menu-header">
+                    <div class="mobile-menu-logo">
+                        <i class="fa-solid fa-dumbbell"></i>
+                        <span>Peak<span>Fit</span></span>
+                    </div>
+                    <button class="mobile-menu-close"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <nav class="mobile-nav-links">
+                    <a href="#about" class="mobile-nav-link">About Us</a>
+                    <a href="#offerings" class="mobile-nav-link">What We Offer</a>
+                    <a href="#membership" class="mobile-nav-link">Membership</a>
+                    <a href="#trainers" class="mobile-nav-link">Our Trainers</a>
+                    <a href="#join" class="mobile-nav-link">Join Us</a>
+                </nav>
+                <div class="mobile-nav-actions">
+                    <a href="login.html" class="btn btn-outline btn-sm">Member Login</a>
+                    <a href="register.html" class="btn btn-gold btn-sm">Join PeakFit</a>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(mobileMenu);
+
+        // Add styles for mobile menu
+        const style = document.createElement("style");
+        style.textContent = `
+            .mobile-menu {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 85%;
+                max-width: 320px;
+                height: 100vh;
+                background: var(--dark2);
+                border-left: 1px solid var(--border);
+                z-index: 1000;
+                transition: right 0.3s var(--ease);
+                overflow-y: auto;
+            }
+            .mobile-menu.open {
+                right: 0;
+            }
+            .mobile-menu-inner {
+                padding: 24px 20px;
+                display: flex;
+                flex-direction: column;
+                gap: 32px;
+            }
+            .mobile-menu-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .mobile-menu-logo {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-family: var(--ff-display);
+                font-size: 20px;
+                font-weight: 600;
+                color: var(--white);
+            }
+            .mobile-menu-logo i {
+                color: var(--gold);
+            }
+            .mobile-menu-logo span {
+                color: var(--gold-bright);
+                font-style: italic;
+            }
+            .mobile-menu-close {
+                width: 32px;
+                height: 32px;
+                border-radius: var(--r-xs);
+                background: var(--dark3);
+                border: 1px solid var(--border);
+                color: var(--w50);
+                cursor: pointer;
+                font-size: 16px;
+                transition: all 0.2s;
+            }
+            .mobile-menu-close:hover {
+                background: var(--red-dim);
+                color: var(--red);
+            }
+            .mobile-nav-links {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+            .mobile-nav-link {
+                padding: 12px 0;
+                font-size: 16px;
+                font-weight: 500;
+                color: var(--w70);
+                border-bottom: 1px solid var(--border);
+                transition: color 0.2s;
+            }
+            .mobile-nav-link:hover {
+                color: var(--gold-bright);
+            }
+            .mobile-nav-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                padding-top: 12px;
+            }
+            .mobile-nav-actions .btn {
+                justify-content: center;
+            }
+            .menu-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                backdrop-filter: blur(4px);
+                z-index: 999;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s var(--ease);
+            }
+            .menu-overlay.open {
+                opacity: 1;
+                visibility: visible;
+            }
+        `;
+        document.head.appendChild(style);
+      }
+
+      // Create overlay
+      let overlay = document.querySelector(".menu-overlay");
+      if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.className = "menu-overlay";
+        document.body.appendChild(overlay);
+      }
+
+      // Open menu
+      hamburger.addEventListener("click", () => {
+        mobileMenu.classList.add("open");
+        overlay.classList.add("open");
+        document.body.style.overflow = "hidden";
+      });
+
+      // Close menu function
+      const closeMenu = () => {
+        mobileMenu.classList.remove("open");
+        overlay.classList.remove("open");
+        document.body.style.overflow = "";
+      };
+
+      // Close button
+      const closeBtn = mobileMenu.querySelector(".mobile-menu-close");
+      if (closeBtn) closeBtn.addEventListener("click", closeMenu);
+
+      // Click overlay to close
+      overlay.addEventListener("click", closeMenu);
+
+      // Close menu when clicking a link
+      const mobileLinks = mobileMenu.querySelectorAll(".mobile-nav-link");
+      mobileLinks.forEach((link) => {
+        link.addEventListener("click", closeMenu);
+      });
+    };
+
+    // ============================================
+    // SMOOTH SCROLLING FOR ANCHOR LINKS
+    // ============================================
+
+    const initSmoothScroll = () => {
+      const links = document.querySelectorAll('a[href^="#"]');
+
+      links.forEach((link) => {
+        link.addEventListener("click", (e) => {
+          const targetId = link.getAttribute("href");
+          if (targetId === "#") return;
+
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            e.preventDefault();
+            const navHeight = 80;
+            const targetPosition = targetElement.offsetTop - navHeight;
+
+            window.scrollTo({
+              top: targetPosition,
+              behavior: "smooth",
+            });
+
+            // Update URL without jumping
+            history.pushState(null, null, targetId);
+          }
+        });
+      });
+    };
+
+    // ============================================
+    // ACTIVE NAV LINK ON SCROLL
+    // ============================================
+
+    const initActiveNavLink = () => {
+      const sections = document.querySelectorAll("section[id]");
+      const navLinks = document.querySelectorAll(".nav-link, .mobile-nav-link");
+
+      const updateActiveLink = () => {
+        const scrollPosition = window.scrollY + 100;
+
+        sections.forEach((section) => {
+          const sectionTop = section.offsetTop;
+          const sectionBottom = sectionTop + section.offsetHeight;
+
+          if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+            const currentId = section.getAttribute("id");
+            navLinks.forEach((link) => {
+              link.classList.remove("active");
+              if (link.getAttribute("href") === `#${currentId}`) {
+                link.classList.add("active");
+              }
+            });
+          }
+        });
+      };
+
+      window.addEventListener("scroll", updateActiveLink);
+      updateActiveLink();
+    };
+
+    // ============================================
+    // ADD ACTIVE CLASS STYLES
+    // ============================================
+
+    const addActiveLinkStyles = () => {
+      const style = document.createElement("style");
+      style.textContent = `
+        .nav-link.active {
+            color: var(--gold-bright);
+            background: var(--gold-dim);
+        }
+        .mobile-nav-link.active {
+            color: var(--gold-bright);
+        }
+    `;
+      document.head.appendChild(style);
+    };
+
+    // ============================================
+    // UPDATE STATS DYNAMICALLY FROM LOCALSTORAGE
+    // ============================================
+
+    const updateDynamicStats = () => {
+      // Get data from localStorage
+      const allMembers =
+        JSON.parse(localStorage.getItem("memberDetailsArray")) || [];
+      const trainerDetails =
+        JSON.parse(localStorage.getItem("TrainerDetails")) || [];
+      const classDetails =
+        JSON.parse(localStorage.getItem("classDetails")) || [];
+      const attendanceRecords =
+        JSON.parse(localStorage.getItem("attendance")) || [];
+
+      // Update member count
+      const memberCountElements = document.querySelectorAll(
+        '.ws-num:first-child, .sc-val[style*="gold-bright"], .hero-badge-item',
+      );
+      const memberCountSpan = document.querySelector(
+        ".ws-item:first-child .ws-num",
+      );
+      if (memberCountSpan && allMembers.length > 0) {
+        memberCountSpan.innerText = allMembers.length;
+      }
+
+      // Update trainer count
+      const trainerCountSpan = document.querySelector(
+        ".ws-item:nth-child(2) .ws-num",
+      );
+      if (trainerCountSpan && trainerDetails.length > 0) {
+        trainerCountSpan.innerText = trainerDetails.length;
+      }
+
+      // Update class count
+      const classCountSpan = document.querySelector(
+        ".ws-item:nth-child(3) .ws-num",
+      );
+      if (classCountSpan && classDetails.length > 0) {
+        classCountSpan.innerText = classDetails.length + "+";
+      }
+
+      // Update floating card numbers
+      const activeMembersCard = document.querySelector(".sc-1 .sc-val");
+      if (activeMembersCard && allMembers.length > 0) {
+        activeMembersCard.innerText = allMembers.length;
+      }
+
+      const trainersCard = document.querySelector(".sc-4 .sc-val");
+      if (trainersCard && trainerDetails.length > 0) {
+        trainersCard.innerText = trainerDetails.length;
+      }
+
+      // Calculate today's attendance rate
+      const today = new Date();
+      const todayAttendance = attendanceRecords.filter((record) => {
+        const recordDate = new Date(record[2]);
+        return recordDate.toDateString() === today.toDateString();
+      }).length;
+
+      const attendanceRate =
+        allMembers.length > 0
+          ? Math.round((todayAttendance / allMembers.length) * 100)
+          : 98;
+      const satisfactionCard = document.querySelector(".sc-2 .sc-val");
+      if (satisfactionCard) {
+        satisfactionCard.innerText = attendanceRate + "%";
+      }
+    };
+
+    // ============================================
+    // PARALLAX EFFECT ON ORBS
+    // ============================================
+
+    const initParallax = () => {
+      const orbs = document.querySelectorAll(".orb-1, .orb-2, .orb-3");
+
+      window.addEventListener("scroll", () => {
+        const scrolled = window.scrollY;
+
+        orbs.forEach((orb, index) => {
+          const speed = 0.15 + index * 0.05;
+          const yOffset = scrolled * speed;
+          orb.style.transform = `translateY(${yOffset}px)`;
+        });
+      });
+    };
+
+    // ============================================
+    // COUNTUP ANIMATION FOR STATS
+    // ============================================
+
+    const initCountUp = () => {
+      const statElements = document.querySelectorAll(".ws-num, .sc-val");
+
+      const isElementInViewport = (el) => {
+        const rect = el.getBoundingClientRect();
+        return rect.top <= window.innerHeight - 100;
+      };
+
+      const animateValue = (element, start, end, duration) => {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+          if (!startTimestamp) startTimestamp = timestamp;
+          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+          const currentValue = Math.floor(progress * (end - start) + start);
+          element.innerText = currentValue;
+          if (progress < 1) {
+            window.requestAnimationFrame(step);
+          }
+        };
+        window.requestAnimationFrame(step);
+      };
+
+      let animated = false;
+
+      const checkStats = () => {
+        if (animated) return;
+
+        const statsSection = document.querySelector(".welcome-stats");
+        if (statsSection && isElementInViewport(statsSection)) {
+          animated = true;
+
+          statElements.forEach((el) => {
+            const finalValue = parseInt(el.innerText);
+            if (!isNaN(finalValue)) {
+              el.innerText = "0";
+              animateValue(el, 0, finalValue, 1500);
+            }
+          });
+        }
+      };
+
+      window.addEventListener("scroll", checkStats);
+      checkStats();
+    };
+
+    // ============================================
+    // HEADER SCROLL EFFECT
+    // ============================================
+
+    const initHeaderScroll = () => {
+      const nav = document.querySelector(".nav");
+      let lastScroll = 0;
+
+      window.addEventListener("scroll", () => {
+        const currentScroll = window.scrollY;
+
+        if (currentScroll > 50) {
+          nav.style.background = "rgba(8, 9, 11, 0.98)";
+          nav.style.backdropFilter = "blur(24px)";
+          nav.style.padding = "14px 0";
+        } else {
+          nav.style.background = "rgba(8, 9, 11, 0.92)";
+          nav.style.backdropFilter = "blur(24px)";
+          nav.style.padding = "20px 0";
+        }
+
+        lastScroll = currentScroll;
+      });
+    };
+
+    // ============================================
+    // ADD FLOATING ANIMATION TO CARDS ON SCROLL
+    // ============================================
+
+    const initScrollReveal = () => {
+      const revealElements = document.querySelectorAll(
+        ".offer-card, .plan-card, .trainer-card, .testi-card, .join-step, .wv-card",
+      );
+
+      const isElementInViewport = (el) => {
+        const rect = el.getBoundingClientRect();
+        return rect.top <= window.innerHeight - 80;
+      };
+
+      const checkReveal = () => {
+        revealElements.forEach((el) => {
+          if (isElementInViewport(el) && !el.classList.contains("revealed")) {
+            el.classList.add("revealed");
+            el.style.opacity = "0";
+            el.style.transform = "translateY(30px)";
+            el.style.transition = "all 0.6s var(--ease)";
+
+            setTimeout(() => {
+              el.style.opacity = "1";
+              el.style.transform = "translateY(0)";
+            }, 50);
+          }
+        });
+      };
+
+      // Set initial state
+      revealElements.forEach((el) => {
+        if (!el.classList.contains("plan-card")) {
+          el.style.opacity = "0";
+          el.style.transform = "translateY(30px)";
+        }
+      });
+
+      window.addEventListener("scroll", checkReveal);
+      setTimeout(checkReveal, 300);
+    };
+
+    // ============================================
+    // UPDATE COPYRIGHT YEAR
+    // ============================================
+
+    const updateCopyrightYear = () => {
+      const yearSpan = document.querySelector(".footer-copy span");
+      if (yearSpan) {
+        const currentYear = new Date().getFullYear();
+        yearSpan.innerText = `PeakFit Gym ${currentYear}`;
+      }
+    };
+
+    // ============================================
+    // PRELOADER (Optional)
+    // ============================================
+
+    const initPreloader = () => {
+      const preloader = document.createElement("div");
+      preloader.className = "preloader";
+      preloader.innerHTML = `
+        <div class="preloader-content">
+            <div class="preloader-spinner"></div>
+            <div class="preloader-text">Peak<span>Fit</span></div>
+        </div>
+    `;
+
+      const style = document.createElement("style");
+      style.textContent = `
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--black);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s var(--ease), visibility 0.5s;
+        }
+        .preloader.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .preloader-content {
+            text-align: center;
+        }
+        .preloader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--border);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        .preloader-text {
+            font-family: var(--ff-display);
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--white);
+        }
+        .preloader-text span {
+            color: var(--gold-bright);
+            font-style: italic;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    `;
+      document.head.appendChild(style);
+      document.body.appendChild(preloader);
+
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          preloader.classList.add("hide");
+          setTimeout(() => preloader.remove(), 500);
+        }, 500);
+      });
+    };
+
+    // ============================================
+    // INITIALIZE ALL FUNCTIONS
+    // ============================================
+
+    const init = () => {
+      initMobileMenu();
+      initSmoothScroll();
+      initActiveNavLink();
+      addActiveLinkStyles();
+      updateDynamicStats();
+      initParallax();
+      initCountUp();
+      initHeaderScroll();
+      initScrollReveal();
+      updateCopyrightYear();
+      // initPreloader(); // Uncomment if you want preloader
+
+      // Add resize handler for responsive adjustments
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 768) {
+          const mobileMenu = document.querySelector(".mobile-menu");
+          const overlay = document.querySelector(".menu-overlay");
+          if (mobileMenu && mobileMenu.classList.contains("open")) {
+            mobileMenu.classList.remove("open");
+            if (overlay) overlay.classList.remove("open");
+            document.body.style.overflow = "";
+          }
+        }
+      });
+    };
+
+    // Run when DOM is ready
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
 </html>
