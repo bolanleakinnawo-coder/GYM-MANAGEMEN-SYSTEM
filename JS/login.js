@@ -1,12 +1,14 @@
-// LOGIN.JS - Complete Fixed Version
 // ============================================
-
-// ============================================
-// SECURITY: Redirect if already logged in
+// FIXED: Only redirect if we're coming from another page
 // ============================================
 let alreadyLoggedIn = JSON.parse(localStorage.getItem("currentUser"));
 
-if (alreadyLoggedIn) {
+// ONLY redirect if user is already logged in AND we're NOT on login page
+// This prevents the login page itself from redirecting
+if (
+  alreadyLoggedIn &&
+  window.location.pathname.includes("login.html") === false
+) {
   if (alreadyLoggedIn.role === "admin") {
     window.location.href = "admin-dashboard.html";
   } else if (alreadyLoggedIn.role === "trainer") {
@@ -15,6 +17,13 @@ if (alreadyLoggedIn) {
     window.location.href = "member-dashboard.html";
   }
   throw new Error("Already logged in");
+}
+
+// If we ARE on login page and user is logged in, clear it (fresh login)
+if (alreadyLoggedIn && window.location.pathname.includes("login.html")) {
+  // Optional: Clear auto-login for fresh session
+  // Comment this out if you want to keep auto-redirect
+  localStorage.removeItem("currentUser");
 }
 
 // ============================================
