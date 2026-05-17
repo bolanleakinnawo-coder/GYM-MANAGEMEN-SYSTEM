@@ -1,47 +1,26 @@
-// LOGIN JS - WITH FIREBASE
-// ============================================
-
-// ============================================
-// FIREBASE REFERENCE
-// ============================================
 let db = window.db;
-
-// ============================================
-// STORED DATA - Will be loaded from Firebase
-// ============================================
+// Stored data from Firebase
 let allMembers = [];
 let trainerDetails = [];
 let adminDetails = [];
 
-// ============================================
-// SECURITY: Only redirect if already logged in AND on login page
-// ============================================
+//security check
 
 let alreadyLoggedIn = JSON.parse(localStorage.getItem("currentUser"));
 
-// IMPORTANT FIX: Only redirect if user is logged in AND we're on login page
-// This prevents infinite loops
 if (alreadyLoggedIn && window.location.pathname.includes("login.html")) {
-  // Clear the stored user to allow fresh login
-  // This ensures the login page shows properly
   localStorage.removeItem("currentUser");
   localStorage.removeItem("currentMember");
   alreadyLoggedIn = null;
 }
 
-// Rest of your code starts here
 let roleText = document.getElementById("roleBannerText");
 let selectedRole = "member";
 let loginBtnText = document.getElementById("loginBtnText");
 let loginBtn = document.getElementById("loginBtn");
 
-// ============================================
-// LOAD DATA FROM FIREBASE
-// ============================================
-
+//load data from firebase
 async function loadFirebaseData() {
-  console.log("Loading login data from Firebase...");
-
   // Load members
   const membersSnapshot = await get(child(ref(db), "members"));
   if (membersSnapshot.exists()) {
@@ -53,16 +32,11 @@ async function loadFirebaseData() {
   if (trainersSnapshot.exists()) {
     trainerDetails = trainersSnapshot.val();
   }
-
-  console.log("Login data loaded from Firebase!");
 }
 
-// ============================================
-// INITIALIZE ADMIN IN FIREBASE (Run once)
-// ============================================
+// INITIALIZE ADMIN IN FIREBASE
 
 async function initAdminInFirebase() {
-  // Check if admin already exists in Firebase
   const adminSnapshot = await get(child(ref(db), "admin"));
 
   if (!adminSnapshot.exists()) {
@@ -76,18 +50,14 @@ async function initAdminInFirebase() {
   }
 }
 
-// ============================================
-// ROLE SELECTOR - UPDATED WITH FULL UI
-// ============================================
+//Role selector function
 
 const roleSelector = (role) => {
   selectedRole = role;
 
-  // Update hidden input
   let selectedRoleInput = document.getElementById("selectedRole");
   if (selectedRoleInput) selectedRoleInput.value = role;
 
-  // Get DOM elements
   let tabMember = document.getElementById("tabMember");
   let tabTrainer = document.getElementById("tabTrainer");
   let tabAdmin = document.getElementById("tabAdmin");
@@ -128,6 +98,7 @@ const roleSelector = (role) => {
       loginBtnTextSpan.innerHTML =
         '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In as Member';
     }
+
     // Show register link only for members
     if (registerLink) registerLink.style.display = "block";
   } else if (role === "trainer") {
@@ -159,15 +130,11 @@ const roleSelector = (role) => {
     // Hide register link for admins
     if (registerLink) registerLink.style.display = "none";
   }
-
-  // Clear any error messages when switching roles
   hideAlert();
   clearFieldErrors();
 };
 
-// ============================================
 // FIELD VALIDATION
-// ============================================
 
 const validateFields = () => {
   let isValid = true;
@@ -204,8 +171,7 @@ const showAlert = (message) => {
   let alertMessage = document.getElementById("alertMessage");
   if (alertMessage) alertMessage.innerText = message;
   if (alertBox) alertBox.classList.add("visible");
-
-  // Auto-hide after 4 seconds
+  s;
   setTimeout(() => {
     if (alertBox) alertBox.classList.remove("visible");
   }, 4000);
@@ -216,9 +182,7 @@ const hideAlert = () => {
   if (alertBox) alertBox.classList.remove("visible");
 };
 
-// ============================================
 // LOADING STATE
-// ============================================
 
 const setLoading = (isLoading) => {
   let btn = document.getElementById("loginBtn");
@@ -233,9 +197,7 @@ const setLoading = (isLoading) => {
   }
 };
 
-// ============================================
 // LOGIN FUNCTION - WITH FIREBASE
-// ============================================
 
 async function login() {
   // Validate fields first
@@ -326,15 +288,12 @@ async function login() {
       }
     }
   } catch (error) {
-    console.error("Login error:", error);
     showAlert("An error occurred during login. Please try again.");
     setLoading(false);
   }
 }
 
-// ============================================
 // PASSWORD TOGGLE
-// ============================================
 
 const passwordToggle = () => {
   let password = document.getElementById("password");
@@ -349,9 +308,7 @@ const passwordToggle = () => {
   }
 };
 
-// ============================================
 // REMEMBER ME FUNCTIONALITY
-// ============================================
 
 const remember = () => {
   let rememberBox = document.getElementById("rememberBox");
@@ -380,9 +337,7 @@ const loadRememberedUser = () => {
   }
 };
 
-// ============================================
 // ENTER KEY SUPPORT
-// ============================================
 
 const setupEnterKey = () => {
   let usernameInput = document.getElementById("username");
@@ -399,9 +354,7 @@ const setupEnterKey = () => {
   if (passwordInput) passwordInput.addEventListener("keypress", handleEnter);
 };
 
-// ============================================
 // FORGOT PASSWORD LINK
-// ============================================
 
 const setupForgotLink = () => {
   let forgotLink = document.getElementById("forgotLink");
@@ -426,18 +379,16 @@ const setupForgotLink = () => {
   }
 };
 
-// ============================================
 // INITIALIZE PAGE
-// ============================================
 
 const initLoginPage = async () => {
-  // Wait for Firebase to be ready
+  
   if (window.db) {
     db = window.db;
     await initAdminInFirebase();
     await loadFirebaseData();
   } else {
-    // Wait for Firebase to initialize
+    
     const waitForFirebase = setInterval(async () => {
       if (window.db) {
         db = window.db;

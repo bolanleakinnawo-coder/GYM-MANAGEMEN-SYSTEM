@@ -1,47 +1,27 @@
-// ADMIN DASHBOARD JS - WITH FIREBASE
-// ============================================
-
-// ============================================
-// FIREBASE REFERENCE
-// ============================================
 let db = window.db;
 
-// ============================================
-// STORED DATA - Will be loaded from Firebase
-// ============================================
+// STORED DATA from Firebase
 let allMembers = [];
 let trainerDetails = [];
 let classDetails = [];
 let savePaymentDetails = [];
 let attendanceRecords = [];
 
-// ============================================
-// SECURITY CHECK - PREVENT DIRECT ACCESS
-// ============================================
-
-// ============================================
-// SECURITY CHECK - FIXED
-// ============================================
+//Security Check
 
 let currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-// If no user is logged in, go to login page
 if (!currentUser) {
   window.location.href = "login.html";
   throw new Error("Access denied. Please login first.");
 }
-
-// If logged in but NOT admin, go to login page (NOT member dashboard)
 if (currentUser.role !== "admin") {
-  // Clear the invalid session
   localStorage.removeItem("currentUser");
   localStorage.removeItem("currentMember");
-  // Redirect to login page
+
   window.location.href = "login.html";
   throw new Error("Unauthorized access. Please login as admin.");
 }
-
-console.log("✅ Logged in as Admin:", currentUser.name);
 
 //GLOBAL VARIABLES
 let type = "";
@@ -57,13 +37,9 @@ let usernameRegex = /^[a-zA-Z0-9_]{4,}$/;
 let passwordRegex = /^.{8,}$/;
 let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// ============================================
 // FIREBASE FUNCTIONS
-// ============================================
 
 async function loadAllDataFromFirebase() {
-  console.log("Loading admin data from Firebase...");
-
   const membersSnapshot = await get(child(ref(db), "members"));
   if (membersSnapshot.exists()) {
     allMembers = membersSnapshot.val();
@@ -89,38 +65,30 @@ async function loadAllDataFromFirebase() {
     attendanceRecords = attendanceSnapshot.val();
   }
 
-  console.log("All data loaded from Firebase!");
   refreshAllDisplays();
 }
 
 async function saveMembersToFirebase() {
   await set(ref(db, "members"), allMembers);
-  console.log("Members saved to Firebase");
 }
 
 async function saveTrainersToFirebase() {
   await set(ref(db, "trainers"), trainerDetails);
-  console.log("Trainers saved to Firebase");
 }
 
 async function saveClassesToFirebase() {
   await set(ref(db, "classes"), classDetails);
-  console.log("Classes saved to Firebase");
 }
 
 async function savePaymentsToFirebase() {
   await set(ref(db, "payments"), savePaymentDetails);
-  console.log("Payments saved to Firebase");
 }
 
 async function saveAttendanceToFirebase() {
   await set(ref(db, "attendance"), attendanceRecords);
-  console.log("Attendance saved to Firebase");
 }
 
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
+//Check if username is taken for members and trainer
 
 function isUsernameTaken(username, excludeIndex = -1) {
   return allMembers.some(
@@ -146,7 +114,7 @@ if (closeSidebarBtn) {
   });
 }
 
-// Click outside sidebar to close (optional)
+// Click outside sidebar to close
 document.addEventListener("click", (e) => {
   const sidebar = document.getElementById("sidebar");
   const menuToggle = document.getElementById("menuToggle");
@@ -756,11 +724,20 @@ async function saveMember() {
 
 const displayMembersTable = () => {
   let members = [...allMembers];
-  let planFilter = document.getElementById("memberPlanFilter")?.value || "all";
+  let planFilter =
+    (document.getElementById("memberPlanFilter") &&
+      document.getElementById("memberPlanFilter").value) ||
+    "all";
+
   let statusFilter =
-    document.getElementById("memberStatusFilter")?.value || "all";
+    (document.getElementById("memberStatusFilter") &&
+      document.getElementById("memberStatusFilter").value) ||
+    "all";
+
   let searchValue =
-    document.getElementById("memberSearch")?.value.toLowerCase() || "";
+    (document.getElementById("memberSearch") &&
+      document.getElementById("memberSearch").value.toLowerCase()) ||
+    "";
 
   if (planFilter !== "all") {
     members = members.filter((m) => m.membership.selectedPlan === planFilter);
@@ -1242,9 +1219,7 @@ const closeViewTrainerModal = () => {
   if (modal) modal.classList.remove("open");
 };
 
-// ============================================
 // POPULATE DROPDOWNS
-// ============================================
 
 const populateTrainerDropdowns = () => {
   const memberTrainerSelect = document.getElementById("mTrainer");
@@ -1311,9 +1286,7 @@ const setupPaymentAutoFill = () => {
   payMemberSelect.addEventListener("change", setupPaymentAutoFill.handler);
 };
 
-// ============================================
 // PAYMENT RECORDING
-// ============================================
 
 const isDuplicatePayment = (memberName, paymentDate) => {
   const paymentDateObj = new Date(paymentDate);
@@ -1553,9 +1526,7 @@ if (closeReceiptBtn) {
   });
 }
 
-// ============================================
 // CLASS MANAGEMENT
-// ============================================
 
 const displayClassTable = () => {
   let typeFilter = document.getElementById("classTypeFilter")?.value || "all";
@@ -1777,9 +1748,7 @@ const classTypeCategory = (value) => {
   displayClassTable();
 };
 
-// ============================================
 // ATTENDANCE TRACKING
-// ============================================
 
 const updateAttendanceStats = () => {
   let today = new Date();
@@ -2086,9 +2055,7 @@ const displayReports = () => {
       classDetails.length === 0 ? "flex" : "none";
 };
 
-// ============================================
 // DELETE MODAL
-// ============================================
 
 const deleteModal = (index, category) => {
   deleteIndex = index;
@@ -2210,9 +2177,7 @@ const todayAttendance = () => {
   if (ovTodayAtt) ovTodayAtt.innerText = todayAtt;
 };
 
-// ============================================
 // RECENT ACTIVITY & EXPIRED LIST
-// ============================================
 
 const updateRecentActivity = () => {
   let recent = [...savePaymentDetails].reverse().slice(0, 5);
@@ -2272,9 +2237,7 @@ const updateExpiredList = () => {
   });
 };
 
-// ============================================
 // INITIALIZATION
-// ============================================
 
 document.addEventListener("DOMContentLoaded", async () => {
   if (window.db) {

@@ -1,39 +1,28 @@
-// ============================================
-// SECURITY CHECK - FIXED
-// ============================================
-
 let currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-// If no user is logged in, go to login page
 if (!currentUser) {
   window.location.href = "login.html";
   throw new Error("Access denied. Please login first.");
 }
 
-// If logged in but NOT member, go to login page (NOT admin dashboard)
 if (currentUser.role !== "member") {
-  // Clear the invalid session
   localStorage.removeItem("currentUser");
   localStorage.removeItem("currentMember");
-  // Redirect to login page
+
   window.location.href = "login.html";
   throw new Error("Unauthorized access. Please login as member.");
 }
 
-console.log("✅ Logged in as Member:", currentUser.name);
-
-// ============================================
 // FIREBASE REFERENCE
-// ============================================
+
 let db = window.db;
 let allMembers = [];
 let attendanceRecords = [];
 let classDetails = [];
 let currentMember = null;
 
-// ============================================
 // LOAD DATA FROM FIREBASE
-// ============================================
+
 async function loadFirebaseData() {
   console.log("Loading member data from Firebase...");
 
@@ -50,12 +39,7 @@ async function loadFirebaseData() {
 
       if (currentMember) {
         localStorage.setItem("currentMember", JSON.stringify(currentMember));
-        console.log(
-          "✅ Current member found:",
-          currentMember.personalInfo.firstName,
-        );
       } else {
-        console.error("❌ Current member not found in Firebase!");
         window.location.href = "login.html";
         return;
       }
@@ -73,19 +57,14 @@ async function loadFirebaseData() {
       classDetails = classesSnapshot.val();
     }
 
-    console.log("✅ Firebase data loaded!");
-
-    // Now initialize all displays AFTER data is loaded
     initializeAllDisplays();
   } catch (error) {
-    console.error("Error loading Firebase data:", error);
     showToast("Error loading data. Please refresh the page.", false);
   }
 }
 
-// ============================================
-// INITIALIZE ALL DISPLAYS (Called after data loads)
-// ============================================
+// INITIALIZE ALL DISPLAYS
+
 function initializeAllDisplays() {
   setGreeting();
   setNavUser();
@@ -103,9 +82,8 @@ function initializeAllDisplays() {
   setupLogout();
 }
 
-// ============================================
 // TOAST NOTIFICATION
-// ============================================
+
 const showToast = (message, success = true) => {
   let toast = document.getElementById("toast");
   let toastText = document.getElementById("toastText");
@@ -123,9 +101,6 @@ const showToast = (message, success = true) => {
   setTimeout(() => toast.classList.remove("show"), 3500);
 };
 
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
 const getInitials = (first, last) => {
   if (!first || !last) return "PF";
   return (first.charAt(0) + last.charAt(0)).toUpperCase();
@@ -136,9 +111,8 @@ const capitalize = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-// ============================================
 // GREETING
-// ============================================
+
 const setGreeting = () => {
   let hour = new Date().getHours();
   let greeting;
@@ -155,9 +129,8 @@ const setGreeting = () => {
   if (wbGreeting) wbGreeting.innerText = greeting;
 };
 
-// ============================================
 // NAV USER
-// ============================================
+
 const setNavUser = () => {
   let navAvatar = document.getElementById("navAvatar");
   let navUserName = document.getElementById("navUserName");
@@ -178,9 +151,8 @@ const setNavUser = () => {
   }
 };
 
-// ============================================
 // WELCOME BANNER
-// ============================================
+
 const displayWelcomeName = () => {
   if (!currentMember || !currentMember.personalInfo) {
     let wbFirstName = document.getElementById("wbFirstName");
@@ -201,9 +173,8 @@ const displayWelcomeName = () => {
   if (wbDeco) wbDeco.innerText = initials.toUpperCase();
 };
 
-// ============================================
 // PERSONAL INFO DISPLAY
-// ============================================
+
 const showInfo = () => {
   if (!currentMember || !currentMember.personalInfo) return;
 
@@ -221,9 +192,8 @@ const showInfo = () => {
   if (infoDob) infoDob.innerText = new Date(p.dob).toDateString();
 };
 
-// ============================================
 // MEMBERSHIP CARD + COUNTDOWN
-// ============================================
+
 const initMembershipCard = () => {
   let joinDateElement = document.getElementById("mcJoinDate");
   let expiryDateElement = document.getElementById("mcExpiry");
@@ -309,9 +279,8 @@ const initMembershipCard = () => {
   }
 };
 
-// ============================================
 // MEMBERSHIP DETAILS DISPLAY
-// ============================================
+
 const membershipDetailsDisplay = () => {
   if (!currentMember || !currentMember.personalInfo) return;
 
@@ -367,9 +336,8 @@ const membershipDetailsDisplay = () => {
   if (pqsGoal) pqsGoal.innerText = goal;
 };
 
-// ============================================
 // LOAD PROFILE FORM
-// ============================================
+
 const loadProfileForm = () => {
   if (!currentMember || !currentMember.personalInfo) return;
 
@@ -391,9 +359,8 @@ const loadProfileForm = () => {
   membershipDetailsDisplay();
 };
 
-// ============================================
 // SAVE PROFILE CHANGES
-// ============================================
+
 const saveChanges = async () => {
   let newFirstName = document.getElementById("editFirstName").value;
   let newLastName = document.getElementById("editLastName").value;
@@ -430,9 +397,8 @@ const saveChanges = async () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
-// ============================================
 // UPDATE PASSWORD
-// ============================================
+
 const updatePassword = async () => {
   let currentPw = document.getElementById("editCurrentPw").value;
   let newPw = document.getElementById("editNewPw").value;
@@ -470,9 +436,8 @@ const updatePassword = async () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
-// ============================================
 // EDIT PROFILE
-// ============================================
+
 const editProfile = () => {
   let allTabButtons = document.querySelectorAll(".tab-btn");
   let allPanels = document.querySelectorAll(".tab-panel");
@@ -492,9 +457,8 @@ const editProfile = () => {
   loadProfileForm();
 };
 
-// ============================================
 // ATTENDANCE FUNCTIONS
-// ============================================
+
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth();
 
@@ -701,9 +665,7 @@ const updateAttendanceSummary = () => {
   if (attRate) attRate.innerText = attendanceRate + "%";
 };
 
-// ============================================
 // CLASS SCHEDULE FUNCTIONS
-// ============================================
 const renderClassSchedule = (dayFilter = "all") => {
   let container = document.getElementById("classList");
   let emptyMessage = document.getElementById("scheduleEmpty");
@@ -859,9 +821,7 @@ const renderUpcomingClasses = () => {
   container.innerHTML = html;
 };
 
-// ============================================
 // TAB LISTENERS
-// ============================================
 function setupTabListeners() {
   let allTabButtons = document.querySelectorAll(".tab-btn");
   let allPanels = document.querySelectorAll(".tab-panel");
@@ -910,9 +870,8 @@ function setupTabListeners() {
   if (tabOverview) tabOverview.classList.add("active");
 }
 
-// ============================================
 // DAY TABS FOR SCHEDULE
-// ============================================
+
 function setupDayTabs() {
   let dayTabs = document.querySelectorAll(".day-tab");
   for (let i = 0; i < dayTabs.length; i++) {
@@ -926,9 +885,7 @@ function setupDayTabs() {
   }
 }
 
-// ============================================
 // MONTH FILTER FOR ATTENDANCE
-// ============================================
 function setupMonthFilter() {
   let attMonthFilter = document.getElementById("attMonthFilter");
   if (attMonthFilter) {
@@ -939,9 +896,8 @@ function setupMonthFilter() {
   }
 }
 
-// ============================================
 // CALENDAR NAVIGATION
-// ============================================
+
 function setupCalendarNav() {
   let calPrevBtn = document.getElementById("calPrev");
   let calNextBtn = document.getElementById("calNext");
@@ -969,9 +925,8 @@ function setupCalendarNav() {
   }
 }
 
-// ============================================
 // LOGOUT
-// ============================================
+
 function setupLogout() {
   let logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
@@ -983,9 +938,8 @@ function setupLogout() {
   }
 }
 
-// ============================================
 // GO TO SCHEDULE BUTTON
-// ============================================
+
 function setupGoToSchedule() {
   let goToScheduleBtn = document.getElementById("goToSchedule");
   let allTabButtons = document.querySelectorAll(".tab-btn");
@@ -1017,9 +971,8 @@ function setupGoToSchedule() {
   }
 }
 
-// ============================================
 // CHANGE PLAN BUTTON
-// ============================================
+
 let selectedNewPlanId = "";
 
 function setupChangePlan() {
@@ -1161,11 +1114,7 @@ const confirmPlanChange = async () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
-// ============================================
-// START THE APP
-// ============================================
 async function startApp() {
-  // Wait for Firebase to be ready
   if (window.db && window.get && window.child && window.ref) {
     db = window.db;
     await loadFirebaseData();
@@ -1178,7 +1127,6 @@ async function startApp() {
       }
     }, 100);
 
-    // Timeout after 5 seconds
     setTimeout(() => {
       if (!db) {
         console.error("Firebase not loaded!");
@@ -1187,7 +1135,6 @@ async function startApp() {
     }, 5000);
   }
 
-  // Setup event listeners
   setupDayTabs();
   setupMonthFilter();
   setupCalendarNav();
@@ -1195,10 +1142,8 @@ async function startApp() {
   setupChangePlan();
 }
 
-// Start the application
 startApp();
 
-// Make functions available globally for onclick
 window.saveChanges = saveChanges;
 window.updatePassword = updatePassword;
 window.editProfile = editProfile;

@@ -1,32 +1,17 @@
-// TRAINER DASHBOARD JS - WITH FIREBASE
-// ============================================
-
-// ============================================
-// FIREBASE REFERENCE
-// ============================================
 let db = window.db;
 
-// ============================================
-// STORED DATA - Will be loaded from Firebase
-// ============================================
 let allMembers = [];
 let classDetails = [];
 let attendanceRecords = [];
 let trainerDetails = [];
 
-// ============================================
-// SECURITY CHECK - FIXED
-// ============================================
-
 let currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-// If no user is logged in, go to login page
 if (!currentUser) {
   window.location.href = "login.html";
   throw new Error("Access denied. Please login first.");
 }
 
-// If logged in but NOT trainer, go to login page
 if (currentUser.role !== "trainer") {
   // Clear the invalid session
   localStorage.removeItem("currentUser");
@@ -35,8 +20,6 @@ if (currentUser.role !== "trainer") {
   window.location.href = "login.html";
   throw new Error("Unauthorized access. Please login as trainer.");
 }
-
-console.log("✅ Logged in as Trainer:", currentUser.name);
 
 // CURRENT TRAINER
 let currentTrainer = JSON.parse(localStorage.getItem("currentUser"));
@@ -49,9 +32,7 @@ if (!currentTrainer || currentTrainer.role !== "trainer") {
 // GET TRAINER FULL DATA
 let loggedInTrainer = null;
 
-// ============================================
 // LOAD DATA FROM FIREBASE
-// ============================================
 
 async function loadFirebaseData() {
   console.log("Loading trainer data from Firebase...");
@@ -76,7 +57,6 @@ async function loadFirebaseData() {
     trainerDetails = trainersSnapshot.val();
   }
 
-  // Find logged in trainer
   for (let trainer of trainerDetails) {
     if (trainer.traineruserName === currentTrainer.name) {
       loggedInTrainer = trainer;
@@ -86,13 +66,10 @@ async function loadFirebaseData() {
 
   console.log("Trainer data loaded from Firebase!");
 
-  // Initialize dashboard after data is loaded
   init();
 }
 
-// ============================================
 // SAVE DATA TO FIREBASE
-// ============================================
 
 async function saveTrainersToFirebase() {
   await set(ref(db, "trainers"), trainerDetails);
@@ -104,7 +81,6 @@ async function saveAttendanceToFirebase() {
   console.log("Attendance saved to Firebase");
 }
 
-// HELPER: Get trainer's full name
 const getTrainerFullName = () => {
   if (loggedInTrainer) {
     return `${loggedInTrainer.trainerfirstName} ${loggedInTrainer.trainerlastName}`;
@@ -112,28 +88,23 @@ const getTrainerFullName = () => {
   return currentTrainer.name || "Trainer";
 };
 
-// HELPER: Get trainer's specialisation
 const getTrainerSpec = () => {
   return loggedInTrainer ? loggedInTrainer.trainerSpec : "Fitness Trainer";
 };
 
-// HELPER: Get trainer's email
 const getTrainerEmail = () => {
   return loggedInTrainer ? loggedInTrainer.traineremail : "";
 };
 
-// HELPER: Get trainer's phone
 const getTrainerPhone = () => {
   return loggedInTrainer ? loggedInTrainer.trainerphone : "";
 };
 
-// HELPER: Get classes assigned to this trainer
 const getMyClasses = () => {
   const trainerName = getTrainerFullName();
   return classDetails.filter((cls) => cls.classTrainer === trainerName);
 };
 
-// HELPER: Get members assigned to this trainer
 const getMyMembers = () => {
   const trainerName = getTrainerFullName();
   return allMembers.filter(
@@ -141,7 +112,6 @@ const getMyMembers = () => {
   );
 };
 
-// HELPER: Get membership details (same as admin)
 function getMembershipDetails(member) {
   let startDate = new Date(member.membership.startDate);
   let expiryDate = new Date(startDate);
@@ -157,9 +127,8 @@ function getMembershipDetails(member) {
   return { startDate, expiryDate, status };
 }
 
-// ============================================
 // SET WELCOME DATE & TIME
-// ============================================
+
 const setDate = () => {
   let today = new Date();
   let options = {
@@ -179,9 +148,8 @@ const setDate = () => {
 };
 setDate();
 
-// ============================================
 // LOAD TRAINER PROFILE
-// ============================================
+
 const loadTrainerProfile = () => {
   const fullName = getTrainerFullName();
   const initials = (fullName.charAt(0) || "T").toUpperCase();
@@ -223,9 +191,8 @@ const loadTrainerProfile = () => {
   }
 };
 
-// ============================================
 // SIDEBAR & NAVIGATION
-// ============================================
+
 const setActiveSidebarLink = (pageName) => {
   document
     .querySelectorAll(".sb-link")
@@ -246,7 +213,6 @@ const showPage = (pageName) => {
   document.getElementById(`page-${pageName}`).classList.add("active");
   setActiveSidebarLink(pageName);
 
-  // Refresh data when switching pages
   if (pageName === "overview") refreshOverview();
   else if (pageName === "classes") renderMyClasses();
   else if (pageName === "members") renderMyMembers();
@@ -265,7 +231,6 @@ document.querySelectorAll(".sb-link").forEach((link) => {
   });
 });
 
-// Quick nav from overview
 document.querySelectorAll(".sec-lbl-a").forEach((link) => {
   link.addEventListener("click", () => {
     const page = link.getAttribute("data-page");
@@ -284,9 +249,8 @@ document.getElementById("logoutBtn")?.addEventListener("click", () => {
   window.location.href = "login.html";
 });
 
-// ============================================
 // UPDATE COUNTS (Sidebar badges)
-// ============================================
+
 const updateCounts = () => {
   const myClasses = getMyClasses();
   const myMembers = getMyMembers();
@@ -299,9 +263,8 @@ const updateCounts = () => {
   document.getElementById("profMembers").innerText = myMembers.length;
 };
 
-// ============================================
 // OVERVIEW PAGE
-// ============================================
+
 const refreshOverview = () => {
   const myClasses = getMyClasses();
   const myMembers = getMyMembers();
@@ -368,7 +331,6 @@ const refreshOverview = () => {
     });
   }
 
-  // Quick members list (first 5)
   const quickMembers = document.getElementById("quickMembers");
   const quickEmpty = document.getElementById("quickMembersEmpty");
 
@@ -501,9 +463,7 @@ const renderWeekTable = (classes) => {
   tbody.innerHTML = html;
 };
 
-// ============================================
 // MY CLASSES PAGE
-// ============================================
 const renderMyClasses = (dayFilter = "all") => {
   let myClasses = getMyClasses();
   const container = document.getElementById("classList");
@@ -597,9 +557,8 @@ document.querySelectorAll(".day-tab").forEach((tab) => {
   });
 });
 
-// ============================================
 // MY MEMBERS PAGE
-// ============================================
+
 const renderMyMembers = () => {
   let myMembers = getMyMembers();
   const searchValue =
@@ -720,7 +679,6 @@ const renderMembersTable = (members) => {
   tbody.innerHTML = html;
 };
 
-// Filter event listeners
 document
   .getElementById("memSearch")
   ?.addEventListener("input", () => renderMyMembers());
@@ -774,7 +732,6 @@ const renderCalendar = () => {
     0,
   ).getDate();
 
-  // Map day numbers to day names
   const dayNames = [
     "sunday",
     "monday",
@@ -836,19 +793,16 @@ const updateAttendanceStats = () => {
   const myClasses = getMyClasses();
   const classNames = myClasses.map((c) => c.className);
 
-  // Filter attendance for trainer's classes
   const myAttendance = attendanceRecords.filter((record) =>
     classNames.includes(record[1]),
   );
 
-  // Today's attendance
   const today = new Date();
   const todayStr = today.toISOString().split("T")[0];
   const todayAtt = myAttendance.filter((a) => a[2] === todayStr).length;
   document.getElementById("attToday").innerText = todayAtt;
   document.getElementById("attTotal").innerText = myAttendance.length;
 
-  // Attendance rate (approximate)
   const rate =
     myAttendance.length > 0
       ? Math.min(
@@ -858,7 +812,6 @@ const updateAttendanceStats = () => {
       : 0;
   document.getElementById("attRate").innerText = rate + "%";
 
-  // Populate class filter dropdown
   const classFilter = document.getElementById("attClassFilter");
   classFilter.innerHTML = '<option value="all">All Classes</option>';
   myClasses.forEach((cls) => {
@@ -876,7 +829,6 @@ const renderAttendanceLog = () => {
     classNames.includes(record[1]),
   );
 
-  // Apply filters
   const classFilter = document.getElementById("attClassFilter")?.value || "all";
   const monthFilter = document.getElementById("attMonthFilter")?.value || "all";
 
@@ -932,9 +884,6 @@ document
   .getElementById("attMonthFilter")
   ?.addEventListener("change", renderAttendanceLog);
 
-// ============================================
-// PROFILE PAGE - SAVE FUNCTIONS (UPDATED FOR FIREBASE)
-// ============================================
 const showToast = (message, isError = false) => {
   const toast = document.getElementById("toast");
   const toastText = document.getElementById("toastText");
@@ -961,7 +910,6 @@ document.getElementById("saveProfile")?.addEventListener("click", async () => {
     trainerBio: document.getElementById("editBio").value,
   };
 
-  // Update in trainerDetails array
   const index = trainerDetails.findIndex(
     (t) => t.traineruserName === loggedInTrainer.traineruserName,
   );
@@ -1010,9 +958,6 @@ document.getElementById("savePw")?.addEventListener("click", async () => {
   }
 });
 
-// ============================================
-// INITIALIZE DASHBOARD
-// ============================================
 const init = () => {
   loadTrainerProfile();
   updateCounts();
@@ -1024,9 +969,6 @@ const init = () => {
   renderAttendanceLog();
 };
 
-// ============================================
-// START: Wait for Firebase then load data
-// ============================================
 async function startTrainerDashboard() {
   if (window.db) {
     db = window.db;
@@ -1057,7 +999,7 @@ if (closeSidebarBtn) {
   });
 }
 
-// Optional: Close sidebar when clicking outside on mobile
+//Close sidebar when clicking outside on mobile
 document.addEventListener("click", function (e) {
   const sidebar = document.getElementById("sidebar");
   const menuToggle = document.getElementById("menuToggle");

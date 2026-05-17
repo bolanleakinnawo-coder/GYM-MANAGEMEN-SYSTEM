@@ -1515,39 +1515,6 @@
     </div>
     <!-- /page-wrap -->
 
-    <!-- ══════════════════════════════════════
-     JS HOOKS GUIDE (for your JavaScript)
-     ══════════════════════════════════════
-  ROLE TABS:
-    - #tabMember, #tabTrainer, #tabAdmin  → click to switch role
-    - #selectedRole (hidden input)        → stores current role value: "member" | "trainer" | "admin"
-    - #roleBanner                         → change class to "member" | "trainer" | "admin"
-    - #roleBannerText                     → update inner text
-    - #loginBtn                           → change class to "member" | "trainer" | "admin"
-    - #loginBtnText                       → update button label
-    - #registerLink                       → show only when role === "member"
-    - #loginForm                          → add class "role-member" | "role-trainer" | "role-admin"
-                                           (controls focus colours)
-
-  FORM INPUTS:
-    - #username   → username or email value
-    - #password   → password value
-    - #pwToggle   → show/hide password (toggle type attr + icon)
-    - #rememberBox → toggle "checked" class
-
-  VALIDATION:
-    - #usernameError → add class "visible" to show
-    - #passwordError → add class "visible" to show
-    - #alertBox      → add class "visible" for wrong credentials
-    - #alertMessage  → set inner text for custom error message
-
-  LOGIN BUTTON:
-    - #loginBtn → add class "loading" to show spinner
-    - After auth → redirect based on role:
-        member  → member-dashboard.html
-        trainer → trainer-dashboard.html
-        admin   → admin-dashboard.html
-══════════════════════════════════════ -->
   </body>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";

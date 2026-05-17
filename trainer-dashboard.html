@@ -382,7 +382,7 @@
               <div class="mc-row"><span class="mc-key"><i class="fa-solid fa-star"></i>Plan</span><span class="mc-val">Premium</span></div>
               <div class="mc-row"><span class="mc-key"><i class="fa-solid fa-calendar-xmark"></i>Expires</span><span class="mc-val">30 Mar 2026</span></div>
               <div class="mc-row"><span class="mc-key"><i class="fa-solid fa-circle-dot"></i>Status</span><span class="mc-val"><span class="pill pill-active"><span class="dot"></span>Active</span></span></div>
-              <div class="mc-row"><span class="mc-key"><i class="fa-solid fa-phone"></i>Phone</span><span class="mc-val">+234 800 000 0000</span></div>
+              <div class="mc-row"><span class="mc-key"><i class="fa-solid fa-phone"></i>Phone</span><span class="mc-val">0 800 000 0000</span></div>
             </div>
           </div>
           -->
@@ -653,7 +653,7 @@
                         type="tel"
                         class="fi2"
                         id="editPhone"
-                        placeholder="+234..."
+                        placeholder="0..."
                       />
                     </div>
                   </div>
@@ -752,76 +752,6 @@
       <i class="fa-solid fa-circle-check"></i>
       <span class="toast-text" id="toastText">Done!</span>
     </div>
-
-    <!--
-JS HOOKS GUIDE
-==============
-
-SIDEBAR & NAV
-  #sbAv, #sbName, #sbSpec         → trainer initials, name, specialisation
-  #sbCntClasses, #sbCntMembers    → badge counts
-  .sb-link[data-page]             → click → switch panel + active state
-  #tbCrumb                        → update breadcrumb on page switch
-  #tbDate                         → today's date string
-  #logoutBtn                      → clear session → redirect to login.html
-  #menuToggle                     → toggle sidebar.open (mobile)
-  .sec-lbl-a[data-page]           → navigate to page
-
-OVERVIEW
-  #wbName, #pmAv, #pmName, #pmSpec → trainer name + profile mini
-  #pmClasses, #pmMembers           → counts
-  #ovClasses, #ovMembers, #ovToday, #ovWeek → stat numbers
-  #todayLabel                      → today formatted e.g. "Tuesday, 24 Mar"
-  #todayList                       → append .tc-item divs (hide #todayEmpty if data)
-  #quickMembers                    → append first 5 member info rows (hide #quickMembersEmpty)
-  #weekBody                        → append <tr> rows (hide #weekEmpty)
-
-MY CLASSES
-  #clsTotal, #clsToday, #clsWeek, #clsEnrolled → numbers
-  .day-tab[data-day]               → click → filter #classList items by [data-day]
-  #classList                       → append .cls-card divs (hide #classEmpty)
-                                     Filter: classes where trainerId === loggedInTrainer.id
-
-MY MEMBERS
-  #memTotal, #memActive, #memExpired → numbers
-  #memSearch                         → filter cards + table by name/email
-  #memStatus, #memPlan               → filter cards + table
-  #memCards                          → append .mem-card divs (hide #memEmpty)
-  #memTableBody                      → append <tr> rows (read-only, no action buttons)
-  (hide #memTableEmpty if data)
-  Filter: members where assignedTrainer === loggedInTrainer.id
-
-CLASS ATTENDANCE
-  #attToday, #attTotal, #attRate    → numbers
-  #calTitle                         → "March 2026"
-  #calPrev / #calNext               → re-render calendar
-  #calGrid                          → populate .cal-day divs
-                                      Mark "has-cls" if trainer has a class that day
-  #attClassFilter                   → populate options from trainer's classes
-  #attMonthFilter                   → filter log
-  #attBody                          → append <tr> rows (hide #attEmpty)
-                                      Filter: attendance for classes assigned to this trainer
-
-MY PROFILE
-  #profAv, #profNm                  → initials, name
-  #profClasses, #profMembers        → counts
-  #profUsername, #profEmail, #profPhone, #profSpec → values
-  #editFirst, #editLast, #editEmail, #editPhone,
-  #editSpec, #editBio               → pre-fill from localStorage on load
-  #saveProfile                      → save to localStorage → show toast
-  #editCurPw, #editNewPw, #editConfPw → password change
-  #savePw                           → validate + update → show toast
-
-TOAST
-  #toast     → add class "show" → remove after 3s
-  #toastText → message
-
-DATA FILTERING
-  On login → store trainer ID in sessionStorage as "loggedInTrainerId"
-  Classes → filter where class.trainerId === loggedInTrainerId
-  Members → filter where member.assignedTrainer === loggedInTrainerId
-  Attendance → filter where the class belongs to this trainer
--->
   </body>
   <script>
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";

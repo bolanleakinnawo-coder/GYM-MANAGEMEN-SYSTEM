@@ -1,15 +1,8 @@
-// REGISTER.JS - WITH FIREBASE & COMPLETE VALIDATIONS
-// ============================================
-
-// ============================================
-// FIREBASE REFERENCE
-// ============================================
 let db = window.db;
 let allMembers = [];
 
-// ============================================
 // REGEX PATTERNS
-// ============================================
+
 let phoneRegex = /^(070|071|080|081|082|090|091)\d{8}$/;
 let usernameRegex = /^[a-zA-Z0-9_]{4,}$/;
 let passwordRegex = /^.{8,}$/;
@@ -26,9 +19,7 @@ let memberDetails = {
 let selectedPlan = "";
 let selectedPlanPrice = "";
 
-// ============================================
 // LOAD DATA FROM FIREBASE
-// ============================================
 
 async function loadFirebaseData() {
   console.log("Loading register data from Firebase...");
@@ -41,9 +32,7 @@ async function loadFirebaseData() {
   console.log("Register data loaded from Firebase!");
 }
 
-// ============================================
 // SAVE MEMBER TO FIREBASE
-// ============================================
 
 async function saveMemberToFirebase(memberData) {
   allMembers.push(memberData);
@@ -51,14 +40,11 @@ async function saveMemberToFirebase(memberData) {
   console.log("Member saved to Firebase!");
 }
 
-// Clear errors on page load
 document
   .querySelectorAll(".form-error")
   .forEach((err) => err.classList.remove("visible"));
 
-// ============================================
-// STEP 1 - PERSONAL INFO (COMPLETE VALIDATIONS)
-// ============================================
+// STEP 1 - PERSONAL INFO
 
 const nextStep1 = () => {
   let isValid = true;
@@ -327,9 +313,7 @@ const genderCheck = () => {
   }
 };
 
-// ============================================
 // STEP 2 - ACCOUNT SETUP (COMPLETE VALIDATIONS)
-// ============================================
 
 const nextStep2 = () => {
   document
@@ -571,15 +555,12 @@ const updatePasswordStrength = (password) => {
   }
 };
 
-// ============================================
 // STEP 3 - MEMBERSHIP (COMPLETE VALIDATIONS)
-// ============================================
 
 const selectPlan = (plan) => {
   selectedPlan = plan;
   document.getElementById("selectedPlan").value = plan;
 
-  // Update UI
   let basicPlan = document.getElementById("planBasic");
   let premiumPlan = document.getElementById("planPremium");
   let elitePlan = document.getElementById("planElite");
@@ -599,7 +580,6 @@ const selectPlan = (plan) => {
     selectedPlanPrice = 25000;
   }
 
-  // Hide plan error if visible
   document.getElementById("planError").classList.remove("visible");
 };
 
@@ -679,10 +659,8 @@ const completeReg = async () => {
     fitnessGoal: fitnessGoal || "Not specified",
   };
 
-  // Save to Firebase instead of localStorage
   await saveMemberToFirebase(tempDetails);
 
-  // Also save currentMember to localStorage for immediate session
   localStorage.setItem("currentMember", JSON.stringify(tempDetails));
 
   // Show success state
@@ -693,10 +671,7 @@ const completeReg = async () => {
   // Clear temp data
   localStorage.removeItem("memberDetailsTemp");
 };
-
-// ============================================
 // BACK BUTTONS
-// ============================================
 
 const backStep2 = () => {
   let tempDetails = JSON.parse(localStorage.getItem("memberDetailsTemp")) || {
@@ -749,9 +724,7 @@ document.getElementById("backStep3")?.addEventListener("click", () => {
     "Set up your login credentials so you can securely access your membership.";
 });
 
-// ============================================
 // TERMS CHECKBOX
-// ============================================
 
 document.getElementById("termsGroup")?.addEventListener("click", () => {
   let checkbox = document.getElementById("termsCheckbox");
@@ -759,9 +732,7 @@ document.getElementById("termsGroup")?.addEventListener("click", () => {
   document.getElementById("termsError").classList.remove("visible");
 });
 
-// ============================================
 // PASSWORD TOGGLE FUNCTIONS
-// ============================================
 
 const showPasswordToogle = () => {
   let password = document.getElementById("password");
@@ -787,9 +758,7 @@ const showPasswordToogle2 = () => {
   }
 };
 
-// ============================================
-// SET DEFAULT START DATE (tomorrow)
-// ============================================
+// SET DEFAULT START DATE
 
 const setDefaultDate = () => {
   let tomorrow = new Date();
@@ -802,15 +771,11 @@ const setDefaultDate = () => {
 
 setDefaultDate();
 
-// ============================================
-// INITIALIZE PLAN SELECTION (Premium as default)
-// ============================================
+// INITIALIZE PLAN SELECTION
 
 selectPlan("premium");
 
-// ============================================
 // PASSWORD STRENGTH LISTENER
-// ============================================
 
 document.getElementById("password")?.addEventListener("input", (e) => {
   updatePasswordStrength(e.target.value);
@@ -822,17 +787,12 @@ document.getElementById("confirmPassword")?.addEventListener("input", () => {
   confirmPasswordCheck();
 });
 
-// Emergency phone listener
+
 document.getElementById("emergencyPhone")?.addEventListener("blur", () => {
   emergencyPhoneCheck();
 });
 
-// ============================================
-// INITIALIZE PAGE - LOAD FIREBASE DATA
-// ============================================
-
 async function initRegisterPage() {
-  // Wait for Firebase to be ready
   if (window.db) {
     db = window.db;
     await loadFirebaseData();
@@ -847,5 +807,4 @@ async function initRegisterPage() {
   }
 }
 
-// Start initialization
 initRegisterPage();
