@@ -1,47 +1,35 @@
-// ADMIN DASHBOARD JS - WITH FIREBASE
-// ============================================
-
-// ============================================
-// FIREBASE REFERENCE
-// ============================================
-let db = window.db;
-
-// ============================================
-// STORED DATA - Will be loaded from Firebase
-// ============================================
-let allMembers = [];
-let trainerDetails = [];
-let classDetails = [];
-let savePaymentDetails = [];
-let attendanceRecords = [];
+// STORED DATA
+let allMembers = JSON.parse(localStorage.getItem("memberDetailsArray")) || [];
+let trainerDetails = JSON.parse(localStorage.getItem("TrainerDetails")) || [];
+let classDetails = JSON.parse(localStorage.getItem("classDetails")) || [];
+let savePaymentDetails =
+  JSON.parse(localStorage.getItem("savePaymentDetails")) || [];
+let attendanceRecords = JSON.parse(localStorage.getItem("attendance")) || [];
 
 // ============================================
 // SECURITY CHECK - PREVENT DIRECT ACCESS
 // ============================================
 
-// ============================================
-// SECURITY CHECK - FIXED
-// ============================================
-
+// Check if user is logged in
 let currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-// If no user is logged in, go to login page
+// If no user is logged in, redirect to login page
 if (!currentUser) {
   window.location.href = "login.html";
   throw new Error("Access denied. Please login first.");
 }
 
-// If logged in but NOT admin, go to login page (NOT member dashboard)
+// If logged in but not admin, redirect to appropriate dashboard
 if (currentUser.role !== "admin") {
-  // Clear the invalid session
-  localStorage.removeItem("currentUser");
-  localStorage.removeItem("currentMember");
-  // Redirect to login page
-  window.location.href = "login.html";
-  throw new Error("Unauthorized access. Please login as admin.");
+  if (currentUser.role === "member") {
+    window.location.href = "member-dashboard.html";
+  } else if (currentUser.role === "trainer") {
+    window.location.href = "trainer-dashboard.html";
+  } else {
+    window.location.href = "login.html";
+  }
+  throw new Error("Unauthorized access.");
 }
-
-console.log("✅ Logged in as Admin:", currentUser.name);
 
 //GLOBAL VARIABLES
 let type = "";
@@ -56,71 +44,6 @@ let phoneRegex = /^(070|071|080|081|082|090|091)\d{8}$/;
 let usernameRegex = /^[a-zA-Z0-9_]{4,}$/;
 let passwordRegex = /^.{8,}$/;
 let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-// ============================================
-// FIREBASE FUNCTIONS
-// ============================================
-
-async function loadAllDataFromFirebase() {
-  console.log("Loading admin data from Firebase...");
-
-  const membersSnapshot = await get(child(ref(db), "members"));
-  if (membersSnapshot.exists()) {
-    allMembers = membersSnapshot.val();
-  }
-
-  const trainersSnapshot = await get(child(ref(db), "trainers"));
-  if (trainersSnapshot.exists()) {
-    trainerDetails = trainersSnapshot.val();
-  }
-
-  const classesSnapshot = await get(child(ref(db), "classes"));
-  if (classesSnapshot.exists()) {
-    classDetails = classesSnapshot.val();
-  }
-
-  const paymentsSnapshot = await get(child(ref(db), "payments"));
-  if (paymentsSnapshot.exists()) {
-    savePaymentDetails = paymentsSnapshot.val();
-  }
-
-  const attendanceSnapshot = await get(child(ref(db), "attendance"));
-  if (attendanceSnapshot.exists()) {
-    attendanceRecords = attendanceSnapshot.val();
-  }
-
-  console.log("All data loaded from Firebase!");
-  refreshAllDisplays();
-}
-
-async function saveMembersToFirebase() {
-  await set(ref(db, "members"), allMembers);
-  console.log("Members saved to Firebase");
-}
-
-async function saveTrainersToFirebase() {
-  await set(ref(db, "trainers"), trainerDetails);
-  console.log("Trainers saved to Firebase");
-}
-
-async function saveClassesToFirebase() {
-  await set(ref(db, "classes"), classDetails);
-  console.log("Classes saved to Firebase");
-}
-
-async function savePaymentsToFirebase() {
-  await set(ref(db, "payments"), savePaymentDetails);
-  console.log("Payments saved to Firebase");
-}
-
-async function saveAttendanceToFirebase() {
-  await set(ref(db, "attendance"), attendanceRecords);
-  console.log("Attendance saved to Firebase");
-}
-
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
 
 function isUsernameTaken(username, excludeIndex = -1) {
   return allMembers.some(
@@ -137,25 +60,6 @@ function isTrainerUsernameTaken(username, excludeIndex = -1) {
       trainer.traineruserName.toLowerCase() === username.toLowerCase(),
   );
 }
-
-// Close sidebar button
-const closeSidebarBtn = document.getElementById("closeSidebarBtn");
-if (closeSidebarBtn) {
-  closeSidebarBtn.addEventListener("click", () => {
-    document.getElementById("sidebar").classList.remove("open");
-  });
-}
-
-// Click outside sidebar to close (optional)
-document.addEventListener("click", (e) => {
-  const sidebar = document.getElementById("sidebar");
-  const menuToggle = document.getElementById("menuToggle");
-  if (sidebar && sidebar.classList.contains("open")) {
-    if (!sidebar.contains(e.target) && !menuToggle?.contains(e.target)) {
-      sidebar.classList.remove("open");
-    }
-  }
-});
 
 function getMembershipDetails(member) {
   let startDate = new Date(member.membership.startDate);
@@ -647,7 +551,7 @@ const selectPlan = (plan) => {
   }
 };
 
-async function saveMember() {
+function saveMember() {
   let isValid = true;
 
   let firstName = document.getElementById("mFirstName").value;
@@ -746,13 +650,14 @@ async function saveMember() {
     showToast("Member updated successfully!");
   }
 
-  await saveMembersToFirebase();
+  localStorage.setItem("memberDetailsArray", JSON.stringify(allMembers));
   closeModal();
   refreshAllDisplays();
   editIndex = null;
 }
 
 // DISPLAY MEMBERS TABLE
+
 
 const displayMembersTable = () => {
   let members = [...allMembers];
@@ -804,7 +709,7 @@ const displayMembersTable = () => {
                 <button class="tbl-btn tbl-btn-delete" onclick="deleteModal(${realIndex}, 'allMembers')"><i class="fa-solid fa-trash"></i> Delete</button>
                 <button class="tbl-btn tbl-btn-view" onclick="viewMember(${realIndex})"><i class="fa-solid fa-eye"></i> View</button>
             </td>
-        </tr>`;
+        </td>`;
   });
 
   const tbody = document.getElementById("membersTableBody");
@@ -1006,7 +911,7 @@ const tPasswordCheck = () => {
   }
 };
 
-async function saveTrainer() {
+function saveTrainer() {
   let isValid = true;
 
   let trainerfirstName = document.getElementById("tFirstName").value;
@@ -1074,7 +979,7 @@ async function saveTrainer() {
     showToast("Trainer updated successfully!");
   }
 
-  await saveTrainersToFirebase();
+  localStorage.setItem("TrainerDetails", JSON.stringify(trainerDetails));
   closeTrainerModal();
   refreshAllDisplays();
 }
@@ -1370,7 +1275,7 @@ function printReceipt() {
   printWindow.close();
 }
 
-async function savePayment() {
+const savePayment = () => {
   let payMember = document.getElementById("payMember").value;
   let payPlan = document.getElementById("payPlan").value;
   let payMethod = document.getElementById("payMethod").value;
@@ -1407,10 +1312,13 @@ async function savePayment() {
     showToast("Payment updated successfully!");
   }
 
-  await savePaymentsToFirebase();
+  localStorage.setItem(
+    "savePaymentDetails",
+    JSON.stringify(savePaymentDetails),
+  );
   closeSavePayment();
   refreshAllDisplays();
-}
+};
 
 const displayPaymentTable = () => {
   let show = "";
@@ -1448,12 +1356,15 @@ const editPayment = (index) => {
   document.getElementById("paymentModal").classList.add("open");
 };
 
-async function deletePayment(index) {
+const deletePayment = (index) => {
   savePaymentDetails.splice(index, 1);
-  await savePaymentsToFirebase();
+  localStorage.setItem(
+    "savePaymentDetails",
+    JSON.stringify(savePaymentDetails),
+  );
   refreshAllDisplays();
   showToast("Payment deleted successfully!");
-}
+};
 
 const payMonthCategory = (value) => {
   if (value === "all") {
@@ -1707,7 +1618,7 @@ const classCapacityCheck = () => {
   return true;
 };
 
-async function saveClass() {
+const saveClass = () => {
   let isValid = true;
   let className = document.getElementById("clsName").value;
   let classType = document.getElementById("clsType").value;
@@ -1750,10 +1661,10 @@ async function saveClass() {
     showToast("Class added successfully!");
   }
 
-  await saveClassesToFirebase();
+  localStorage.setItem("classDetails", JSON.stringify(classDetails));
   closeClassModal();
   refreshAllDisplays();
-}
+};
 
 const editClassInfo = (index) => {
   editClassIndex = index;
@@ -1836,7 +1747,7 @@ const memberChecklist = () => {
   if (emptyEl) emptyEl.style.display = filtered.length === 0 ? "flex" : "none";
 };
 
-async function saveAttendance() {
+const saveAttendance = () => {
   let selectedDate = document.getElementById("attDatePicker").value;
   if (!selectedDate) {
     showToast("Please select a date", true);
@@ -1872,13 +1783,13 @@ async function saveAttendance() {
   });
 
   if (newRecords > 0) {
-    await saveAttendanceToFirebase();
+    localStorage.setItem("attendance", JSON.stringify(attendanceRecords));
     showToast(`Attendance saved for ${newRecords} member(s)!`);
     refreshAllDisplays();
   } else {
     showToast("All selected members already marked for this date", true);
   }
-}
+};
 
 const populateAttendanceMemberFilter = () => {
   let select = document.getElementById("attLogMemberFilter");
@@ -2066,9 +1977,9 @@ const displayReports = () => {
   const revenueBreakdownBody = document.getElementById("revenueBreakdownBody");
   if (revenueBreakdownBody) {
     revenueBreakdownBody.innerHTML = `
-            <tr><td class="td-main">Basic</td><td>${basicCountP}</td><td>₦8,000</td><td>₦${basicRev.toLocaleString()}</td><td>${((basicRev / totalRev) * 100).toFixed(1)}%</td>
-            <tr><td class="td-main">Premium</td><td>${premiumCountP}</td><td>₦15,000</td><td>₦${premiumRev.toLocaleString()}</td><td>${((premiumRev / totalRev) * 100).toFixed(1)}%</td>
-            <tr><td class="td-main">Elite</td><td>${eliteCountP}</td><td>₦25,000</td><td>₦${eliteRev.toLocaleString()}</td><td>${((eliteRev / totalRev) * 100).toFixed(1)}%</td>
+            <tr><td class="td-main">Basic</td><td>${basicCountP}</td><td>₦8,000</td><td>₦${basicRev.toLocaleString()}</td><td>${((basicRev / totalRev) * 100).toFixed(1)}%</td></tr>
+            <tr><td class="td-main">Premium</td><td>${premiumCountP}</td><td>₦15,000</td><td>₦${premiumRev.toLocaleString()}</td><td>${((premiumRev / totalRev) * 100).toFixed(1)}%</td></tr>
+            <tr><td class="td-main">Elite</td><td>${eliteCountP}</td><td>₦25,000</td><td>₦${eliteRev.toLocaleString()}</td><td>${((eliteRev / totalRev) * 100).toFixed(1)}%</td></tr>
         `;
   }
 
@@ -2097,14 +2008,14 @@ const deleteModal = (index, category) => {
   if (modal) modal.classList.add("open");
 };
 
-async function confirmDelete() {
+const confirmDelete = () => {
   if (
     type === "allMembers" &&
     deleteIndex !== null &&
     allMembers[deleteIndex]
   ) {
     allMembers.splice(deleteIndex, 1);
-    await saveMembersToFirebase();
+    localStorage.setItem("memberDetailsArray", JSON.stringify(allMembers));
     showToast("Member deleted successfully!");
     refreshAllDisplays();
   } else if (
@@ -2113,7 +2024,7 @@ async function confirmDelete() {
     trainerDetails[deleteIndex]
   ) {
     trainerDetails.splice(deleteIndex, 1);
-    await saveTrainersToFirebase();
+    localStorage.setItem("TrainerDetails", JSON.stringify(trainerDetails));
     showToast("Trainer deleted successfully!");
     refreshAllDisplays();
   } else if (
@@ -2122,20 +2033,27 @@ async function confirmDelete() {
     classDetails[deleteIndex]
   ) {
     classDetails.splice(deleteIndex, 1);
-    await saveClassesToFirebase();
+    localStorage.setItem("classDetails", JSON.stringify(classDetails));
     showToast("Class deleted successfully!");
     refreshAllDisplays();
   }
   closeDeleteModal();
   deleteIndex = null;
   type = "";
-}
+};
 
 // ============================================
 // REFRESH ALL DISPLAYS
 // ============================================
 
 const refreshAllDisplays = () => {
+  allMembers = JSON.parse(localStorage.getItem("memberDetailsArray")) || [];
+  trainerDetails = JSON.parse(localStorage.getItem("TrainerDetails")) || [];
+  classDetails = JSON.parse(localStorage.getItem("classDetails")) || [];
+  savePaymentDetails =
+    JSON.parse(localStorage.getItem("savePaymentDetails")) || [];
+  attendanceRecords = JSON.parse(localStorage.getItem("attendance")) || [];
+
   const sbBadgeMembers = document.getElementById("sbBadgeMembers");
   const sbBadgeTrainers = document.getElementById("sbBadgeTrainers");
   const sbBadgeClasses = document.getElementById("sbBadgeClasses");
@@ -2276,12 +2194,8 @@ const updateExpiredList = () => {
 // INITIALIZATION
 // ============================================
 
-document.addEventListener("DOMContentLoaded", async () => {
-  if (window.db) {
-    db = window.db;
-    await loadAllDataFromFirebase();
-  }
-
+document.addEventListener("DOMContentLoaded", () => {
+  refreshAllDisplays();
   updateRecentActivity();
   updateExpiredList();
   loadAdminProfile();

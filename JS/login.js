@@ -1,5 +1,17 @@
-// LOGIN.JS - Complete Fixed Version
+// LOGIN JS - WITH FIREBASE
 // ============================================
+
+// ============================================
+// FIREBASE REFERENCE
+// ============================================
+let db = window.db;
+
+// ============================================
+// STORED DATA - Will be loaded from Firebase
+// ============================================
+let allMembers = [];
+let trainerDetails = [];
+let adminDetails = [];
 
 // ============================================
 // SECURITY: Only redirect if already logged in AND on login page
@@ -19,22 +31,49 @@ if (alreadyLoggedIn && window.location.pathname.includes("login.html")) {
 
 // Rest of your code starts here
 let roleText = document.getElementById("roleBannerText");
-let adminDetails = [];
 let selectedRole = "member";
 let loginBtnText = document.getElementById("loginBtnText");
 let loginBtn = document.getElementById("loginBtn");
 
-// Initialize admin if not exists
-const adminInfo = () => {
-  let adminName = "Rokibats";
-  let adminPassword = "rokibat12";
-  let adminObj = { adminName, adminPassword };
-  adminDetails.push(adminObj);
-  localStorage.setItem("adminDetails", JSON.stringify(adminDetails));
-};
+// ============================================
+// LOAD DATA FROM FIREBASE
+// ============================================
 
-if (!localStorage.getItem("adminDetails")) {
-  adminInfo();
+async function loadFirebaseData() {
+  console.log("Loading login data from Firebase...");
+
+  // Load members
+  const membersSnapshot = await get(child(ref(db), "members"));
+  if (membersSnapshot.exists()) {
+    allMembers = membersSnapshot.val();
+  }
+
+  // Load trainers
+  const trainersSnapshot = await get(child(ref(db), "trainers"));
+  if (trainersSnapshot.exists()) {
+    trainerDetails = trainersSnapshot.val();
+  }
+
+  console.log("Login data loaded from Firebase!");
+}
+
+// ============================================
+// INITIALIZE ADMIN IN FIREBASE (Run once)
+// ============================================
+
+async function initAdminInFirebase() {
+  // Check if admin already exists in Firebase
+  const adminSnapshot = await get(child(ref(db), "admin"));
+
+  if (!adminSnapshot.exists()) {
+    // Create default admin
+    const defaultAdmin = {
+      adminName: "Rokibats",
+      adminPassword: "rokibat12",
+    };
+    await set(ref(db, "admin"), defaultAdmin);
+    console.log("Default admin created in Firebase");
+  }
 }
 
 // ============================================
@@ -195,10 +234,10 @@ const setLoading = (isLoading) => {
 };
 
 // ============================================
-// LOGIN FUNCTION - COMPLETE FIXED
+// LOGIN FUNCTION - WITH FIREBASE
 // ============================================
 
-function login() {
+async function login() {
   // Validate fields first
   if (!validateFields()) {
     showAlert("Please enter both username/email and password.");
@@ -210,91 +249,87 @@ function login() {
 
   setLoading(true);
 
-  // Simulate a tiny delay for better UX
-  setTimeout(() => {
-    try {
-      if (selectedRole === "trainer") {
-        let trainerDetails =
-          JSON.parse(localStorage.getItem("TrainerDetails")) || [];
+  try {
+    if (selectedRole === "trainer") {
+      // Trainer login from Firebase
+      let trainerFound = trainerDetails.find(
+        (trainer) =>
+          trainer.traineruserName.toLowerCase() === username.toLowerCase() &&
+          trainer.trainerPassword === password,
+      );
 
-        let trainerFound = trainerDetails.find(
-          (trainer) =>
-            trainer.traineruserName.toLowerCase() === username.toLowerCase() &&
-            trainer.trainerPassword === password,
+      if (trainerFound) {
+        localStorage.setItem(
+          "currentUser",
+          JSON.stringify({
+            role: "trainer",
+            name: trainerFound.traineruserName,
+            fullName: `${trainerFound.trainerfirstName} ${trainerFound.trainerlastName}`,
+          }),
         );
-
-        if (trainerFound) {
-          localStorage.setItem(
-            "currentUser",
-            JSON.stringify({
-              role: "trainer",
-              name: trainerFound.traineruserName,
-              fullName: `${trainerFound.trainerfirstName} ${trainerFound.trainerlastName}`,
-            }),
-          );
-          window.location.href = "trainer-dashboard.html";
-        } else {
-          showAlert("Invalid trainer username or password. Please try again.");
-          setLoading(false);
-        }
-      } else if (selectedRole === "admin") {
-        let adminDetails = JSON.parse(localStorage.getItem("adminDetails"));
-
-        if (
-          adminDetails &&
-          adminDetails[0] &&
-          adminDetails[0].adminName === username &&
-          adminDetails[0].adminPassword === password
-        ) {
-          localStorage.setItem(
-            "currentUser",
-            JSON.stringify({
-              role: "admin",
-              name: adminDetails[0].adminName,
-            }),
-          );
-          window.location.href = "admin-dashboard.html";
-        } else {
-          showAlert("Invalid admin credentials. Please try again.");
-          setLoading(false);
-        }
+        window.location.href = "trainer-dashboard.html";
       } else {
-        // Member login
-        let allMembers =
-          JSON.parse(localStorage.getItem("memberDetailsArray")) || [];
-
-        let memberFound = allMembers.find(
-          (member) =>
-            (member.loginInfo.userName.toLowerCase() ===
-              username.toLowerCase() ||
-              member.personalInfo.email.toLowerCase() ===
-                username.toLowerCase()) &&
-            member.loginInfo.userPassword === password,
-        );
-
-        if (memberFound) {
-          localStorage.setItem(
-            "currentUser",
-            JSON.stringify({
-              role: "member",
-              name: memberFound.loginInfo.userName,
-            }),
-          );
-          localStorage.setItem("currentMember", JSON.stringify(memberFound));
-          window.location.href = "member-dashboard.html";
-        } else {
-          showAlert(
-            "Invalid member username/email or password. Please try again.",
-          );
-          setLoading(false);
-        }
+        showAlert("Invalid trainer username or password. Please try again.");
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      showAlert("An error occurred during login. Please try again.");
-      setLoading(false);
+    } else if (selectedRole === "admin") {
+      // Admin login from Firebase
+      const adminSnapshot = await get(child(ref(db), "admin"));
+      let adminData = null;
+
+      if (adminSnapshot.exists()) {
+        adminData = adminSnapshot.val();
+      }
+
+      if (
+        adminData &&
+        adminData.adminName === username &&
+        adminData.adminPassword === password
+      ) {
+        localStorage.setItem(
+          "currentUser",
+          JSON.stringify({
+            role: "admin",
+            name: adminData.adminName,
+          }),
+        );
+        window.location.href = "admin-dashboard.html";
+      } else {
+        showAlert("Invalid admin credentials. Please try again.");
+        setLoading(false);
+      }
+    } else {
+      // Member login from Firebase
+      let memberFound = allMembers.find(
+        (member) =>
+          (member.loginInfo.userName.toLowerCase() === username.toLowerCase() ||
+            member.personalInfo.email.toLowerCase() ===
+              username.toLowerCase()) &&
+          member.loginInfo.userPassword === password,
+      );
+
+      if (memberFound) {
+        localStorage.setItem(
+          "currentUser",
+          JSON.stringify({
+            role: "member",
+            name: memberFound.loginInfo.userName,
+          }),
+        );
+        localStorage.setItem("currentMember", JSON.stringify(memberFound));
+        window.location.href = "member-dashboard.html";
+      } else {
+        showAlert(
+          "Invalid member username/email or password. Please try again.",
+        );
+        setLoading(false);
+      }
     }
-  }, 300);
+  } catch (error) {
+    console.error("Login error:", error);
+    showAlert("An error occurred during login. Please try again.");
+    setLoading(false);
+  }
 }
 
 // ============================================
@@ -395,7 +430,24 @@ const setupForgotLink = () => {
 // INITIALIZE PAGE
 // ============================================
 
-const initLoginPage = () => {
+const initLoginPage = async () => {
+  // Wait for Firebase to be ready
+  if (window.db) {
+    db = window.db;
+    await initAdminInFirebase();
+    await loadFirebaseData();
+  } else {
+    // Wait for Firebase to initialize
+    const waitForFirebase = setInterval(async () => {
+      if (window.db) {
+        db = window.db;
+        clearInterval(waitForFirebase);
+        await initAdminInFirebase();
+        await loadFirebaseData();
+      }
+    }, 100);
+  }
+
   // Set default role to member
   roleSelector("member");
 
@@ -416,6 +468,9 @@ const initLoginPage = () => {
   let selectedRoleInput = document.getElementById("selectedRole");
   if (selectedRoleInput) selectedRoleInput.value = "member";
 };
+
+// Make login function available globally
+window.login = login;
 
 // Run initialization when DOM is ready
 document.addEventListener("DOMContentLoaded", initLoginPage);

@@ -1,11 +1,22 @@
-// REGISTER.JS - Complete Fixed Version
+// REGISTER.JS - WITH FIREBASE & COMPLETE VALIDATIONS
 // ============================================
 
-let allMembers = JSON.parse(localStorage.getItem("memberDetailsArray")) || [];
+// ============================================
+// FIREBASE REFERENCE
+// ============================================
+let db = window.db;
+let allMembers = [];
+
+// ============================================
+// REGEX PATTERNS
+// ============================================
 let phoneRegex = /^(070|071|080|081|082|090|091)\d{8}$/;
 let usernameRegex = /^[a-zA-Z0-9_]{4,}$/;
 let passwordRegex = /^.{8,}$/;
 let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+let nameRegex = /^[a-zA-Z\s]{2,}$/;
+let emergencyPhoneRegex = /^(070|071|080|081|082|090|091)\d{8}$/;
+
 let memberDetails = {
   personalInfo: {},
   loginInfo: {},
@@ -15,13 +26,38 @@ let memberDetails = {
 let selectedPlan = "";
 let selectedPlanPrice = "";
 
+// ============================================
+// LOAD DATA FROM FIREBASE
+// ============================================
+
+async function loadFirebaseData() {
+  console.log("Loading register data from Firebase...");
+
+  const membersSnapshot = await get(child(ref(db), "members"));
+  if (membersSnapshot.exists()) {
+    allMembers = membersSnapshot.val();
+  }
+
+  console.log("Register data loaded from Firebase!");
+}
+
+// ============================================
+// SAVE MEMBER TO FIREBASE
+// ============================================
+
+async function saveMemberToFirebase(memberData) {
+  allMembers.push(memberData);
+  await set(ref(db, "members"), allMembers);
+  console.log("Member saved to Firebase!");
+}
+
 // Clear errors on page load
 document
   .querySelectorAll(".form-error")
   .forEach((err) => err.classList.remove("visible"));
 
 // ============================================
-// STEP 1 - PERSONAL INFO
+// STEP 1 - PERSONAL INFO (COMPLETE VALIDATIONS)
 // ============================================
 
 const nextStep1 = () => {
@@ -30,66 +66,114 @@ const nextStep1 = () => {
     .querySelectorAll(".form-error")
     .forEach((err) => err.classList.remove("visible"));
 
-  let firstName = document.getElementById("firstName").value;
-  let lastName = document.getElementById("lastName").value;
-  let phone = document.getElementById("phone").value;
-  let email = document.getElementById("email").value;
+  let firstName = document.getElementById("firstName").value.trim();
+  let lastName = document.getElementById("lastName").value.trim();
+  let phone = document.getElementById("phone").value.trim();
+  let email = document.getElementById("email").value.trim();
   let dob = document.getElementById("dob").value;
   let gender = document.getElementById("gender").value;
 
   let validEmail = emailRegex.test(email);
   let validPhoneNo = phoneRegex.test(phone);
 
+  // First Name Validation
   if (firstName === "") {
     document.getElementById("firstNameError").classList.add("visible");
     document.getElementById("firstNameError").innerHTML =
       '<i class="fa-solid fa-circle-exclamation"></i> Please enter your first name';
     isValid = false;
-  } else if (firstName.length < 5) {
+  } else if (firstName.length < 2) {
     document.getElementById("firstNameError").classList.add("visible");
     document.getElementById("firstNameError").innerHTML =
-      '<i class="fa-solid fa-circle-exclamation"></i> First name should be at least 5 characters';
+      '<i class="fa-solid fa-circle-exclamation"></i> First name must be at least 2 characters';
+    isValid = false;
+  } else if (!nameRegex.test(firstName)) {
+    document.getElementById("firstNameError").classList.add("visible");
+    document.getElementById("firstNameError").innerHTML =
+      '<i class="fa-solid fa-circle-exclamation"></i> First name can only contain letters';
     isValid = false;
   } else {
     document.getElementById("firstNameError").classList.remove("visible");
   }
 
+  // Last Name Validation
   if (lastName === "") {
     document.getElementById("lastNameError").classList.add("visible");
     document.getElementById("lastNameError").innerHTML =
       '<i class="fa-solid fa-circle-exclamation"></i> Please enter your last name';
     isValid = false;
+  } else if (lastName.length < 2) {
+    document.getElementById("lastNameError").classList.add("visible");
+    document.getElementById("lastNameError").innerHTML =
+      '<i class="fa-solid fa-circle-exclamation"></i> Last name must be at least 2 characters';
+    isValid = false;
+  } else if (!nameRegex.test(lastName)) {
+    document.getElementById("lastNameError").classList.add("visible");
+    document.getElementById("lastNameError").innerHTML =
+      '<i class="fa-solid fa-circle-exclamation"></i> Last name can only contain letters';
+    isValid = false;
   } else {
     document.getElementById("lastNameError").classList.remove("visible");
   }
 
-  if (!validEmail) {
+  // Email Validation
+  if (email === "") {
     document.getElementById("emailError").classList.add("visible");
     document.getElementById("emailError").innerHTML =
-      '<i class="fa-solid fa-circle-exclamation"></i> Please enter a valid email address';
+      '<i class="fa-solid fa-circle-exclamation"></i> Please enter your email address';
+    isValid = false;
+  } else if (!validEmail) {
+    document.getElementById("emailError").classList.add("visible");
+    document.getElementById("emailError").innerHTML =
+      '<i class="fa-solid fa-circle-exclamation"></i> Please enter a valid email address (e.g., name@example.com)';
     isValid = false;
   } else {
     document.getElementById("emailError").classList.remove("visible");
   }
 
-  if (!validPhoneNo) {
+  // Phone Validation
+  if (phone === "") {
     document.getElementById("phoneError").classList.add("visible");
     document.getElementById("phoneError").innerHTML =
-      '<i class="fa-solid fa-circle-exclamation"></i> Please enter a valid phone number (070/080/081/090/091...)';
+      '<i class="fa-solid fa-circle-exclamation"></i> Please enter your phone number';
+    isValid = false;
+  } else if (!validPhoneNo) {
+    document.getElementById("phoneError").classList.add("visible");
+    document.getElementById("phoneError").innerHTML =
+      '<i class="fa-solid fa-circle-exclamation"></i> Please enter a valid phone number (070/080/081/090/091 + 8 digits)';
     isValid = false;
   } else {
     document.getElementById("phoneError").classList.remove("visible");
   }
 
+  // Date of Birth Validation
   if (dob === "") {
     document.getElementById("dobError").classList.add("visible");
     document.getElementById("dobError").innerHTML =
       '<i class="fa-solid fa-circle-exclamation"></i> Please enter your date of birth';
     isValid = false;
   } else {
-    document.getElementById("dobError").classList.remove("visible");
+    let birthDate = new Date(dob);
+    let today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    let monthDiff = today.getMonth() - birthDate.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+    if (age < 16) {
+      document.getElementById("dobError").classList.add("visible");
+      document.getElementById("dobError").innerHTML =
+        '<i class="fa-solid fa-circle-exclamation"></i> You must be at least 16 years old to join';
+      isValid = false;
+    } else {
+      document.getElementById("dobError").classList.remove("visible");
+    }
   }
 
+  // Gender Validation
   if (gender === "") {
     document.getElementById("genderError").classList.add("visible");
     document.getElementById("genderError").innerHTML =
@@ -128,37 +212,49 @@ const nextStep1 = () => {
     "Set up your login credentials to securely access your membership.";
 };
 
-// Step 1 validations
+// Step 1 validations (real-time)
 const firstNameCheck = () => {
-  let firstName = document.getElementById("firstName").value;
+  let firstName = document.getElementById("firstName").value.trim();
   let errorEl = document.getElementById("firstNameError");
   if (firstName === "") {
     errorEl.classList.add("visible");
     errorEl.innerHTML =
       '<i class="fa-solid fa-circle-exclamation"></i> Please enter your first name';
-  } else if (firstName.length < 5) {
+  } else if (firstName.length < 2) {
     errorEl.classList.add("visible");
     errorEl.innerHTML =
-      '<i class="fa-solid fa-circle-exclamation"></i> First name should be at least 5 characters';
+      '<i class="fa-solid fa-circle-exclamation"></i> First name must be at least 2 characters';
+  } else if (!nameRegex.test(firstName)) {
+    errorEl.classList.add("visible");
+    errorEl.innerHTML =
+      '<i class="fa-solid fa-circle-exclamation"></i> First name can only contain letters';
   } else {
     errorEl.classList.remove("visible");
   }
 };
 
 const lastNameCheck = () => {
-  let lastName = document.getElementById("lastName").value;
+  let lastName = document.getElementById("lastName").value.trim();
   let errorEl = document.getElementById("lastNameError");
   if (lastName === "") {
     errorEl.classList.add("visible");
     errorEl.innerHTML =
       '<i class="fa-solid fa-circle-exclamation"></i> Please enter your last name';
+  } else if (lastName.length < 2) {
+    errorEl.classList.add("visible");
+    errorEl.innerHTML =
+      '<i class="fa-solid fa-circle-exclamation"></i> Last name must be at least 2 characters';
+  } else if (!nameRegex.test(lastName)) {
+    errorEl.classList.add("visible");
+    errorEl.innerHTML =
+      '<i class="fa-solid fa-circle-exclamation"></i> Last name can only contain letters';
   } else {
     errorEl.classList.remove("visible");
   }
 };
 
 const emailCheck = () => {
-  let email = document.getElementById("email").value;
+  let email = document.getElementById("email").value.trim();
   let errorEl = document.getElementById("emailError");
   let validEmail = emailRegex.test(email);
   if (email === "") {
@@ -175,13 +271,17 @@ const emailCheck = () => {
 };
 
 const phoneCheck = () => {
-  let phone = document.getElementById("phone").value;
+  let phone = document.getElementById("phone").value.trim();
   let errorEl = document.getElementById("phoneError");
   let validPhoneNo = phoneRegex.test(phone);
-  if (!validPhoneNo) {
+  if (phone === "") {
     errorEl.classList.add("visible");
     errorEl.innerHTML =
-      '<i class="fa-solid fa-circle-exclamation"></i> Please enter a valid phone number';
+      '<i class="fa-solid fa-circle-exclamation"></i> Please enter your phone number';
+  } else if (!validPhoneNo) {
+    errorEl.classList.add("visible");
+    errorEl.innerHTML =
+      '<i class="fa-solid fa-circle-exclamation"></i> Please enter a valid phone number (070/080/081/090/091 + 8 digits)';
   } else {
     errorEl.classList.remove("visible");
   }
@@ -195,7 +295,23 @@ const dobCheck = () => {
     errorEl.innerHTML =
       '<i class="fa-solid fa-circle-exclamation"></i> Please enter your date of birth';
   } else {
-    errorEl.classList.remove("visible");
+    let birthDate = new Date(dob);
+    let today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    let monthDiff = today.getMonth() - birthDate.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+    if (age < 16) {
+      errorEl.classList.add("visible");
+      errorEl.innerHTML =
+        '<i class="fa-solid fa-circle-exclamation"></i> You must be at least 16 years old to join';
+    } else {
+      errorEl.classList.remove("visible");
+    }
   }
 };
 
@@ -212,7 +328,7 @@ const genderCheck = () => {
 };
 
 // ============================================
-// STEP 2 - ACCOUNT SETUP
+// STEP 2 - ACCOUNT SETUP (COMPLETE VALIDATIONS)
 // ============================================
 
 const nextStep2 = () => {
@@ -227,19 +343,25 @@ const nextStep2 = () => {
     membership: {},
   };
 
-  let userName = document.getElementById("username").value;
+  let userName = document.getElementById("username").value.trim();
   let userPassword = document.getElementById("password").value;
   let confirmPassword = document.getElementById("confirmPassword").value;
-  let emergencyContact = document.getElementById("emergencyContact").value;
-  let emergencyPhone = document.getElementById("emergencyPhone").value;
+  let emergencyContact = document
+    .getElementById("emergencyContact")
+    .value.trim();
+  let emergencyPhone = document.getElementById("emergencyPhone").value.trim();
 
   let validUsername = usernameRegex.test(userName);
   let validPassword = passwordRegex.test(userPassword);
+
+  let validEmergencyPhone =
+    emergencyPhone === "" ? true : emergencyPhoneRegex.test(emergencyPhone);
 
   let existingUser = allMembers.find(
     (member) => member.loginInfo.userName === userName,
   );
 
+  // Username Validation
   if (userName === "") {
     document.getElementById("usernameError").classList.add("visible");
     document.getElementById("usernameError").innerHTML =
@@ -253,12 +375,13 @@ const nextStep2 = () => {
   } else if (existingUser) {
     document.getElementById("usernameError").classList.add("visible");
     document.getElementById("usernameError").innerHTML =
-      '<i class="fa-solid fa-circle-exclamation"></i> Username already exists';
+      '<i class="fa-solid fa-circle-exclamation"></i> Username already exists. Please choose another';
     isValid = false;
   } else {
     document.getElementById("usernameError").classList.remove("visible");
   }
 
+  // Password Validation
   if (userPassword === "") {
     document.getElementById("passwordError").classList.add("visible");
     document.getElementById("passwordError").innerHTML =
@@ -273,6 +396,7 @@ const nextStep2 = () => {
     document.getElementById("passwordError").classList.remove("visible");
   }
 
+  // Confirm Password Validation
   if (userPassword !== confirmPassword) {
     document.getElementById("confirmPasswordError").classList.add("visible");
     document.getElementById("confirmPasswordError").innerHTML =
@@ -280,6 +404,20 @@ const nextStep2 = () => {
     isValid = false;
   } else {
     document.getElementById("confirmPasswordError").classList.remove("visible");
+  }
+
+  // Emergency Phone Validation (only if provided)
+  if (emergencyPhone !== "" && !validEmergencyPhone) {
+    document.getElementById("emergencyPhoneError").classList.add("visible");
+    document.getElementById("emergencyPhoneError").innerHTML =
+      '<i class="fa-solid fa-circle-exclamation"></i> Please enter a valid phone number for emergency contact';
+    isValid = false;
+  } else {
+    if (document.getElementById("emergencyPhoneError")) {
+      document
+        .getElementById("emergencyPhoneError")
+        .classList.remove("visible");
+    }
   }
 
   if (!isValid) return;
@@ -310,7 +448,7 @@ const nextStep2 = () => {
 };
 
 const usernameCheck = () => {
-  let userName = document.getElementById("username").value;
+  let userName = document.getElementById("username").value.trim();
   let errorEl = document.getElementById("usernameError");
   let validUsername = usernameRegex.test(userName);
   let existingUser = allMembers.find(
@@ -326,11 +464,11 @@ const usernameCheck = () => {
   } else if (!validUsername) {
     errorEl.classList.add("visible");
     errorEl.innerHTML =
-      '<i class="fa-solid fa-circle-exclamation"></i> Username must be at least 4 characters';
+      '<i class="fa-solid fa-circle-exclamation"></i> Username must be at least 4 characters (letters, numbers, underscores only)';
   } else if (existingUser) {
     errorEl.classList.add("visible");
     errorEl.innerHTML =
-      '<i class="fa-solid fa-circle-exclamation"></i> Username already exists';
+      '<i class="fa-solid fa-circle-exclamation"></i> Username already exists. Please choose another';
   } else {
     errorEl.classList.remove("visible");
   }
@@ -371,6 +509,33 @@ const confirmPasswordCheck = () => {
   }
 };
 
+// Emergency Phone Validation
+const emergencyPhoneCheck = () => {
+  let emergencyPhone = document.getElementById("emergencyPhone").value.trim();
+  let errorEl = document.getElementById("emergencyPhoneError");
+
+  if (emergencyPhone !== "" && !emergencyPhoneRegex.test(emergencyPhone)) {
+    if (!errorEl) {
+      // Create error element if it doesn't exist
+      const newError = document.createElement("div");
+      newError.className = "form-error";
+      newError.id = "emergencyPhoneError";
+      newError.innerHTML =
+        '<i class="fa-solid fa-circle-exclamation"></i> Please enter a valid phone number';
+      document
+        .getElementById("emergencyPhone")
+        .parentElement.parentElement.appendChild(newError);
+      newError.classList.add("visible");
+    } else {
+      errorEl.classList.add("visible");
+      errorEl.innerHTML =
+        '<i class="fa-solid fa-circle-exclamation"></i> Please enter a valid phone number';
+    }
+  } else {
+    if (errorEl) errorEl.classList.remove("visible");
+  }
+};
+
 // Password strength indicator
 const updatePasswordStrength = (password) => {
   let strength = 0;
@@ -407,7 +572,7 @@ const updatePasswordStrength = (password) => {
 };
 
 // ============================================
-// STEP 3 - MEMBERSHIP
+// STEP 3 - MEMBERSHIP (COMPLETE VALIDATIONS)
 // ============================================
 
 const selectPlan = (plan) => {
@@ -450,7 +615,14 @@ const startDateCheck = () => {
   }
 };
 
-const completeReg = () => {
+const completeReg = async () => {
+  let isValid = true;
+
+  // Clear all step 3 errors
+  document.getElementById("planError").classList.remove("visible");
+  document.getElementById("startDateError").classList.remove("visible");
+  document.getElementById("termsError").classList.remove("visible");
+
   let tempDetails = JSON.parse(localStorage.getItem("memberDetailsTemp")) || {
     personalInfo: {},
     loginInfo: {},
@@ -465,7 +637,7 @@ const completeReg = () => {
     document.getElementById("planError").classList.add("visible");
     document.getElementById("planError").innerHTML =
       '<i class="fa-solid fa-circle-exclamation"></i> Please select a membership plan';
-    return;
+    isValid = false;
   }
 
   // Check start date
@@ -473,7 +645,18 @@ const completeReg = () => {
     document.getElementById("startDateError").classList.add("visible");
     document.getElementById("startDateError").innerHTML =
       '<i class="fa-solid fa-circle-exclamation"></i> Please select a start date';
-    return;
+    isValid = false;
+  } else {
+    // Validate start date is not in the past
+    let selectedDate = new Date(startDate);
+    let today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (selectedDate < today) {
+      document.getElementById("startDateError").classList.add("visible");
+      document.getElementById("startDateError").innerHTML =
+        '<i class="fa-solid fa-circle-exclamation"></i> Start date cannot be in the past';
+      isValid = false;
+    }
   }
 
   // Check terms agreement
@@ -484,18 +667,22 @@ const completeReg = () => {
     document.getElementById("termsError").classList.add("visible");
     document.getElementById("termsError").innerHTML =
       '<i class="fa-solid fa-circle-exclamation"></i> You must agree to the terms and conditions';
-    return;
+    isValid = false;
   }
+
+  if (!isValid) return;
 
   tempDetails.membership = {
     selectedPlan,
     selectedPlanPrice,
     startDate,
-    fitnessGoal,
+    fitnessGoal: fitnessGoal || "Not specified",
   };
 
-  allMembers.push(tempDetails);
-  localStorage.setItem("memberDetailsArray", JSON.stringify(allMembers));
+  // Save to Firebase instead of localStorage
+  await saveMemberToFirebase(tempDetails);
+
+  // Also save currentMember to localStorage for immediate session
   localStorage.setItem("currentMember", JSON.stringify(tempDetails));
 
   // Show success state
@@ -634,3 +821,31 @@ document.getElementById("password")?.addEventListener("input", (e) => {
 document.getElementById("confirmPassword")?.addEventListener("input", () => {
   confirmPasswordCheck();
 });
+
+// Emergency phone listener
+document.getElementById("emergencyPhone")?.addEventListener("blur", () => {
+  emergencyPhoneCheck();
+});
+
+// ============================================
+// INITIALIZE PAGE - LOAD FIREBASE DATA
+// ============================================
+
+async function initRegisterPage() {
+  // Wait for Firebase to be ready
+  if (window.db) {
+    db = window.db;
+    await loadFirebaseData();
+  } else {
+    const waitForFirebase = setInterval(async () => {
+      if (window.db) {
+        db = window.db;
+        clearInterval(waitForFirebase);
+        await loadFirebaseData();
+      }
+    }, 100);
+  }
+}
+
+// Start initialization
+initRegisterPage();

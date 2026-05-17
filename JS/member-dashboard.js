@@ -1,46 +1,111 @@
-// MEMBER DASHBOARD JS
 // ============================================
-
-let allMembers = JSON.parse(localStorage.getItem("memberDetailsArray")) || [];
-let currentMember = JSON.parse(localStorage.getItem("currentMember")) || {
-  personalInfo: {},
-  loginInfo: {},
-  membership: {},
-};
-
-let todayDate = new Date();
-let expiryDateObj;
-
-// ============================================
-// SECURITY CHECK - PREVENT DIRECT ACCESS
+// SECURITY CHECK - FIXED
 // ============================================
 
 let currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-// If no user is logged in, redirect to login page
+// If no user is logged in, go to login page
 if (!currentUser) {
   window.location.href = "login.html";
   throw new Error("Access denied. Please login first.");
 }
 
-// If logged in but not member, redirect to appropriate dashboard
+// If logged in but NOT member, go to login page (NOT admin dashboard)
 if (currentUser.role !== "member") {
-  if (currentUser.role === "admin") {
-    window.location.href = "admin-dashboard.html";
-  } else if (currentUser.role === "trainer") {
-    window.location.href = "trainer-dashboard.html";
-  } else {
-    window.location.href = "login.html";
-  }
-  throw new Error("Unauthorized access.");
+  // Clear the invalid session
+  localStorage.removeItem("currentUser");
+  localStorage.removeItem("currentMember");
+  // Redirect to login page
+  window.location.href = "login.html";
+  throw new Error("Unauthorized access. Please login as member.");
 }
 
-console.log(`✅ Logged in as Member: ${currentUser.name}`);
+console.log("✅ Logged in as Member:", currentUser.name);
+
+// ============================================
+// FIREBASE REFERENCE
+// ============================================
+let db = window.db;
+let allMembers = [];
+let attendanceRecords = [];
+let classDetails = [];
+let currentMember = null;
+
+// ============================================
+// LOAD DATA FROM FIREBASE
+// ============================================
+async function loadFirebaseData() {
+  console.log("Loading member data from Firebase...");
+
+  try {
+    // Load members
+    const membersSnapshot = await get(child(ref(db), "members"));
+    if (membersSnapshot.exists()) {
+      allMembers = membersSnapshot.val();
+
+      // Find current member by username
+      currentMember = allMembers.find(
+        (m) => m.loginInfo.userName === currentUser.name,
+      );
+
+      if (currentMember) {
+        localStorage.setItem("currentMember", JSON.stringify(currentMember));
+        console.log(
+          "✅ Current member found:",
+          currentMember.personalInfo.firstName,
+        );
+      } else {
+        console.error("❌ Current member not found in Firebase!");
+        window.location.href = "login.html";
+        return;
+      }
+    }
+
+    // Load attendance
+    const attendanceSnapshot = await get(child(ref(db), "attendance"));
+    if (attendanceSnapshot.exists()) {
+      attendanceRecords = attendanceSnapshot.val();
+    }
+
+    // Load classes
+    const classesSnapshot = await get(child(ref(db), "classes"));
+    if (classesSnapshot.exists()) {
+      classDetails = classesSnapshot.val();
+    }
+
+    console.log("✅ Firebase data loaded!");
+
+    // Now initialize all displays AFTER data is loaded
+    initializeAllDisplays();
+  } catch (error) {
+    console.error("Error loading Firebase data:", error);
+    showToast("Error loading data. Please refresh the page.", false);
+  }
+}
+
+// ============================================
+// INITIALIZE ALL DISPLAYS (Called after data loads)
+// ============================================
+function initializeAllDisplays() {
+  setGreeting();
+  setNavUser();
+  displayWelcomeName();
+  showInfo();
+  initMembershipCard();
+  membershipDetailsDisplay();
+  loadProfileForm();
+  renderCalendar();
+  renderAttendanceTable();
+  updateAttendanceSummary();
+  renderClassSchedule("all");
+  renderUpcomingClasses();
+  setupTabListeners();
+  setupLogout();
+}
 
 // ============================================
 // TOAST NOTIFICATION
 // ============================================
-
 const showToast = (message, success = true) => {
   let toast = document.getElementById("toast");
   let toastText = document.getElementById("toastText");
@@ -61,19 +126,19 @@ const showToast = (message, success = true) => {
 // ============================================
 // HELPER FUNCTIONS
 // ============================================
-
 const getInitials = (first, last) => {
+  if (!first || !last) return "PF";
   return (first.charAt(0) + last.charAt(0)).toUpperCase();
 };
 
 const capitalize = (str) => {
+  if (!str) return "";
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
 // ============================================
 // GREETING
 // ============================================
-
 const setGreeting = () => {
   let hour = new Date().getHours();
   let greeting;
@@ -89,16 +154,16 @@ const setGreeting = () => {
   let wbGreeting = document.getElementById("wbGreeting");
   if (wbGreeting) wbGreeting.innerText = greeting;
 };
-setGreeting();
 
 // ============================================
 // NAV USER
 // ============================================
-
 const setNavUser = () => {
   let navAvatar = document.getElementById("navAvatar");
   let navUserName = document.getElementById("navUserName");
+
   if (!currentMember || !currentMember.personalInfo) return;
+
   if (navAvatar) {
     navAvatar.innerText = getInitials(
       currentMember.personalInfo.firstName,
@@ -112,12 +177,10 @@ const setNavUser = () => {
       currentMember.personalInfo.lastName.trim();
   }
 };
-setNavUser();
 
 // ============================================
 // WELCOME BANNER
 // ============================================
-
 const displayWelcomeName = () => {
   if (!currentMember || !currentMember.personalInfo) {
     let wbFirstName = document.getElementById("wbFirstName");
@@ -139,10 +202,11 @@ const displayWelcomeName = () => {
 };
 
 // ============================================
-// PERSONAL INFO DISPLAY (Overview)
+// PERSONAL INFO DISPLAY
 // ============================================
-
 const showInfo = () => {
+  if (!currentMember || !currentMember.personalInfo) return;
+
   let p = currentMember.personalInfo;
   let infoFullName = document.getElementById("infoFullName");
   let infoEmail = document.getElementById("infoEmail");
@@ -157,15 +221,10 @@ const showInfo = () => {
   if (infoDob) infoDob.innerText = new Date(p.dob).toDateString();
 };
 
-showInfo();
-
 // ============================================
 // MEMBERSHIP CARD + COUNTDOWN
 // ============================================
-
 const initMembershipCard = () => {
-  currentMember = JSON.parse(localStorage.getItem("currentMember")) || {};
-
   let joinDateElement = document.getElementById("mcJoinDate");
   let expiryDateElement = document.getElementById("mcExpiry");
   let planNameElement = document.getElementById("mcPlanName");
@@ -173,7 +232,11 @@ const initMembershipCard = () => {
   let daysLeftElement = document.getElementById("statDaysLeft");
   let renewalBannerElement = document.getElementById("renewalBanner");
 
-  if (!currentMember.membership || !currentMember.membership.startDate) {
+  if (
+    !currentMember ||
+    !currentMember.membership ||
+    !currentMember.membership.startDate
+  ) {
     if (joinDateElement) joinDateElement.innerHTML = "Not set";
     if (expiryDateElement) expiryDateElement.innerHTML = "Not set";
     return;
@@ -245,14 +308,11 @@ const initMembershipCard = () => {
     }
   }
 };
-initMembershipCard();
 
 // ============================================
-// MEMBERSHIP DETAILS DISPLAY (Profile sidebar)
+// MEMBERSHIP DETAILS DISPLAY
 // ============================================
-
 const membershipDetailsDisplay = () => {
-  currentMember = JSON.parse(localStorage.getItem("currentMember"));
   if (!currentMember || !currentMember.personalInfo) return;
 
   let p = currentMember.personalInfo;
@@ -273,8 +333,7 @@ const membershipDetailsDisplay = () => {
   if (profileAvatarBig) profileAvatarBig.innerText = initials.toUpperCase();
   if (profileFullName) profileFullName.innerText = firstName + " " + lastName;
 
-  let allMembersArr = JSON.parse(localStorage.getItem("memberDetailsArray"));
-  let memberIndex = allMembersArr.findIndex(
+  let memberIndex = allMembers.findIndex(
     (mem) => mem.loginInfo.userName === currentMember.loginInfo.userName,
   );
   let memberNumber = memberIndex + 1;
@@ -308,14 +367,10 @@ const membershipDetailsDisplay = () => {
   if (pqsGoal) pqsGoal.innerText = goal;
 };
 
-membershipDetailsDisplay();
-
 // ============================================
 // LOAD PROFILE FORM
 // ============================================
-
 const loadProfileForm = () => {
-  currentMember = JSON.parse(localStorage.getItem("currentMember"));
   if (!currentMember || !currentMember.personalInfo) return;
 
   let p = currentMember.personalInfo;
@@ -336,15 +391,10 @@ const loadProfileForm = () => {
   membershipDetailsDisplay();
 };
 
-loadProfileForm();
-
 // ============================================
-// PROFILE FORM — SAVE
+// SAVE PROFILE CHANGES
 // ============================================
-
-const saveChanges = () => {
-  currentMember = JSON.parse(localStorage.getItem("currentMember"));
-
+const saveChanges = async () => {
   let newFirstName = document.getElementById("editFirstName").value;
   let newLastName = document.getElementById("editLastName").value;
   let newEmail = document.getElementById("editEmail").value;
@@ -361,54 +411,29 @@ const saveChanges = () => {
 
   localStorage.setItem("currentMember", JSON.stringify(currentMember));
 
-  let allMembersArr = JSON.parse(localStorage.getItem("memberDetailsArray"));
-  let memberIndex = allMembersArr.findIndex(
+  let memberIndex = allMembers.findIndex(
     (member) => member.loginInfo.userName === currentMember.loginInfo.userName,
   );
 
   if (memberIndex !== -1) {
-    allMembersArr[memberIndex].personalInfo = currentMember.personalInfo;
-    localStorage.setItem("memberDetailsArray", JSON.stringify(allMembersArr));
+    allMembers[memberIndex].personalInfo = currentMember.personalInfo;
+    await set(ref(db, "members"), allMembers);
   }
 
   showInfo();
   setNavUser();
   displayWelcomeName();
   membershipDetailsDisplay();
-
-  // Switch back to Overview tab
-  let allTabButtons = document.querySelectorAll(".tab-btn");
-  let allPanels = document.querySelectorAll(".tab-panel");
-
-  for (let i = 0; i < allTabButtons.length; i++) {
-    allTabButtons[i].classList.remove("active");
-  }
-  for (let i = 0; i < allPanels.length; i++) {
-    allPanels[i].classList.remove("active");
-  }
-
-  let tabOverview = document.getElementById("tabOverview");
-  let panelOverview = document.getElementById("panel-overview");
-  if (tabOverview) tabOverview.classList.add("active");
-  if (panelOverview) panelOverview.classList.add("active");
-
-  setGreeting();
-  setNavUser();
-  displayWelcomeName();
-  showInfo();
-  renderUpcomingClasses();
+  loadProfileForm();
 
   showToast("Profile updated successfully!");
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 // ============================================
-// PASSWORD UPDATE
+// UPDATE PASSWORD
 // ============================================
-
-const updatePassword = () => {
-  currentMember = JSON.parse(localStorage.getItem("currentMember"));
-
+const updatePassword = async () => {
   let currentPw = document.getElementById("editCurrentPw").value;
   let newPw = document.getElementById("editNewPw").value;
   let confirmPw = document.getElementById("editConfirmPw").value;
@@ -431,47 +456,23 @@ const updatePassword = () => {
   currentMember.loginInfo.userPassword = newPw;
   localStorage.setItem("currentMember", JSON.stringify(currentMember));
 
-  let allMembers = JSON.parse(localStorage.getItem("memberDetailsArray"));
   let memberIndex = allMembers.findIndex(
     (member) => member.loginInfo.userName === currentMember.loginInfo.userName,
   );
   allMembers[memberIndex].loginInfo.userPassword = newPw;
-  localStorage.setItem("memberDetailsArray", JSON.stringify(allMembers));
+  await set(ref(db, "members"), allMembers);
 
   document.getElementById("editCurrentPw").value = "";
   document.getElementById("editNewPw").value = "";
   document.getElementById("editConfirmPw").value = "";
-
-  // Switch back to Overview tab
-  let allTabButtons = document.querySelectorAll(".tab-btn");
-  let allPanels = document.querySelectorAll(".tab-panel");
-
-  for (let i = 0; i < allTabButtons.length; i++) {
-    allTabButtons[i].classList.remove("active");
-  }
-  for (let i = 0; i < allPanels.length; i++) {
-    allPanels[i].classList.remove("active");
-  }
-
-  let tabOverview = document.getElementById("tabOverview");
-  let panelOverview = document.getElementById("panel-overview");
-  if (tabOverview) tabOverview.classList.add("active");
-  if (panelOverview) panelOverview.classList.add("active");
-
-  setGreeting();
-  setNavUser();
-  displayWelcomeName();
-  showInfo();
-  renderUpcomingClasses();
 
   showToast("Password updated successfully!");
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 // ============================================
-// EDIT PROFILE (Navigate to Profile Tab)
+// EDIT PROFILE
 // ============================================
-
 const editProfile = () => {
   let allTabButtons = document.querySelectorAll(".tab-btn");
   let allPanels = document.querySelectorAll(".tab-panel");
@@ -492,10 +493,549 @@ const editProfile = () => {
 };
 
 // ============================================
-// CHANGE / RENEW PLAN
+// ATTENDANCE FUNCTIONS
 // ============================================
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
 
+const getMyAttendanceDates = () => {
+  if (!currentMember || !currentMember.personalInfo) return [];
+
+  let firstName = currentMember.personalInfo.firstName;
+  let lastName = currentMember.personalInfo.lastName;
+  let myFullName = firstName + " " + lastName;
+
+  let myRecords = [];
+  for (let i = 0; i < attendanceRecords.length; i++) {
+    if (attendanceRecords[i].memberName === myFullName) {
+      myRecords.push(attendanceRecords[i].date);
+    }
+  }
+  return myRecords;
+};
+
+const renderCalendar = () => {
+  let monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  let calTitle = document.getElementById("calMonthTitle");
+  if (calTitle) calTitle.innerText = monthNames[calMonth] + " " + calYear;
+
+  let grid = document.getElementById("calendarGrid");
+  if (!grid) return;
+  grid.innerHTML = "";
+
+  let presentDates = getMyAttendanceDates();
+  let today = new Date();
+
+  let firstDayOfMonth = new Date(calYear, calMonth, 1).getDay();
+  let daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+  for (let i = 0; i < firstDayOfMonth; i++) {
+    let emptyCell = document.createElement("div");
+    emptyCell.className = "cal-day empty";
+    grid.appendChild(emptyCell);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    let cell = document.createElement("div");
+    cell.className = "cal-day";
+    cell.innerText = day;
+
+    let monthNumber = String(calMonth + 1).padStart(2, "0");
+    let dayNumber = String(day).padStart(2, "0");
+    let dateString = calYear + "-" + monthNumber + "-" + dayNumber;
+
+    let isToday =
+      day === today.getDate() &&
+      calMonth === today.getMonth() &&
+      calYear === today.getFullYear();
+    let cellDate = new Date(calYear, calMonth, day);
+    let todayDate = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+    );
+    let isPast = cellDate < todayDate;
+
+    if (isToday) cell.classList.add("today");
+
+    let didAttend = presentDates.includes(dateString);
+
+    if (didAttend) {
+      cell.classList.add("present");
+    } else if (isPast && !isToday) {
+      cell.classList.add("absent");
+    }
+
+    grid.appendChild(cell);
+  }
+};
+
+const renderAttendanceTable = (filterMonth = "all") => {
+  if (!currentMember || !currentMember.personalInfo) return;
+
+  let firstName = currentMember.personalInfo.firstName;
+  let lastName = currentMember.personalInfo.lastName;
+  let myFullName = firstName + " " + lastName;
+
+  let myRecords = attendanceRecords.filter(
+    (record) => record.memberName === myFullName,
+  );
+
+  if (filterMonth !== "all") {
+    myRecords = myRecords.filter((record) => {
+      let recordDate = new Date(record.date);
+      return recordDate.getMonth() + 1 === Number(filterMonth);
+    });
+  }
+
+  myRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  let tbody = document.getElementById("attendanceTableBody");
+  let emptyMessage = document.getElementById("attendanceEmpty");
+
+  if (!tbody) return;
+
+  if (myRecords.length === 0) {
+    tbody.innerHTML = "";
+    if (emptyMessage) emptyMessage.style.display = "flex";
+    return;
+  }
+
+  if (emptyMessage) emptyMessage.style.display = "none";
+
+  let dayNames = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  let html = "";
+
+  for (let i = 0; i < myRecords.length; i++) {
+    let record = myRecords[i];
+    let date = new Date(record.date);
+    let dayName = dayNames[date.getDay()];
+    let displayDate = date.toDateString();
+
+    html += `<tr>
+      <td>${i + 1}</td>
+      <td><span class="td-main">${displayDate}</span></td>
+      <td>${dayName}</td>
+      <td>—</td>
+      <td>—</td>
+      <td>${record.plan}</td>
+      <td><span class="status-pill pill-active"><span class="dot"></span> Present</span></td>
+    </tr>`;
+  }
+
+  tbody.innerHTML = html;
+};
+
+const updateAttendanceSummary = () => {
+  let presentDates = getMyAttendanceDates();
+  let totalVisits = presentDates.length;
+  let now = new Date();
+
+  let visitsThisMonth = presentDates.filter((date) => {
+    let d = new Date(date);
+    return (
+      d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+    );
+  }).length;
+
+  let streak = 0;
+  let checkDate = new Date(now);
+  checkDate.setHours(0, 0, 0, 0);
+
+  let dateSet = {};
+  presentDates.forEach((date) => {
+    dateSet[date] = true;
+  });
+
+  while (true) {
+    let year = checkDate.getFullYear();
+    let month = String(checkDate.getMonth() + 1).padStart(2, "0");
+    let day = String(checkDate.getDate()).padStart(2, "0");
+    let dateString = year + "-" + month + "-" + day;
+
+    if (dateSet[dateString]) {
+      streak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+
+  let joinDate = new Date(currentMember.membership.startDate);
+  let daysSinceJoin = Math.floor((now - joinDate) / (1000 * 60 * 60 * 24)) + 1;
+  let attendanceRate = Math.min(
+    100,
+    Math.round((totalVisits / daysSinceJoin) * 100),
+  );
+
+  let attTotal = document.getElementById("attTotal");
+  let attThisMonth = document.getElementById("attThisMonth");
+  let attStreak = document.getElementById("attStreak");
+  let attRate = document.getElementById("attRate");
+
+  if (attTotal) attTotal.innerText = totalVisits;
+  if (attThisMonth) attThisMonth.innerText = visitsThisMonth;
+  if (attStreak) attStreak.innerText = streak;
+  if (attRate) attRate.innerText = attendanceRate + "%";
+};
+
+// ============================================
+// CLASS SCHEDULE FUNCTIONS
+// ============================================
+const renderClassSchedule = (dayFilter = "all") => {
+  let container = document.getElementById("classList");
+  let emptyMessage = document.getElementById("scheduleEmpty");
+
+  let filteredClasses =
+    dayFilter === "all"
+      ? [...classDetails]
+      : classDetails.filter((cls) => cls.classDay === dayFilter);
+
+  if (!container) return;
+
+  if (filteredClasses.length === 0) {
+    container.innerHTML = "";
+    if (emptyMessage) emptyMessage.style.display = "flex";
+    return;
+  }
+
+  if (emptyMessage) emptyMessage.style.display = "none";
+
+  let html = "";
+
+  for (let cls of filteredClasses) {
+    let typeClass = "yoga";
+    let tagClass = "tag-yoga";
+    let typeLabel = cls.classType;
+
+    if (cls.classType === "yoga") {
+      typeClass = "yoga";
+      tagClass = "tag-yoga";
+      typeLabel = "Yoga";
+    } else if (cls.classType === "zumba") {
+      typeClass = "hiit";
+      tagClass = "tag-hiit";
+      typeLabel = "Zumba";
+    } else if (cls.classType === "weight") {
+      typeClass = "strength";
+      tagClass = "tag-strength";
+      typeLabel = "Weight Training";
+    }
+
+    let endTimeDisplay = "";
+    if (cls.classTime && cls.classDuration) {
+      let timeParts = cls.classTime.split(":");
+      let hour = Number(timeParts[0]);
+      let minute = Number(timeParts[1]);
+      let totalMinutes = hour * 60 + minute + Number(cls.classDuration);
+      let endHour = Math.floor(totalMinutes / 60) % 24;
+      let endMinute = totalMinutes % 60;
+      endTimeDisplay =
+        String(endHour).padStart(2, "0") +
+        ":" +
+        String(endMinute).padStart(2, "0");
+    }
+
+    let formattedDay = cls.classDay
+      ? cls.classDay.charAt(0).toUpperCase() + cls.classDay.slice(1)
+      : "";
+
+    html += `
+      <div class="class-item ${typeClass}" data-day="${cls.classDay}">
+        <div class="class-time">
+          <div class="class-time-start">${cls.classTime || "--:--"}</div>
+          <div class="class-time-end">${endTimeDisplay}</div>
+          <div class="class-time-end" style="font-size:10px;margin-top:4px;color:var(--w35)">${formattedDay}</div>
+        </div>
+        <div class="class-info">
+          <div class="class-name">${cls.className || "—"}</div>
+          <div class="class-trainer"><i class="fa-solid fa-user-tie"></i> ${cls.classTrainer || "TBA"}</div>
+          <div class="class-tags"><span class="class-tag ${tagClass}">${typeLabel}</span></div>
+        </div>
+        <div class="class-slots">
+          <div class="class-slots-num">${cls.classCapacity || "—"}</div>
+          <div class="class-slots-label">capacity</div>
+        </div>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
+};
+
+const renderUpcomingClasses = () => {
+  let container = document.getElementById("upcomingList");
+  let emptyMessage = document.getElementById("upcomingEmpty");
+
+  if (!container) return;
+
+  if (classDetails.length === 0) {
+    if (emptyMessage) emptyMessage.style.display = "flex";
+    container.innerHTML = "";
+    return;
+  }
+
+  let dayOrder = [
+    "sunday",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+  ];
+  let todayIndex = new Date().getDay();
+
+  let sortedClasses = [...classDetails];
+  sortedClasses.sort((a, b) => {
+    let aIndex = dayOrder.indexOf(a.classDay);
+    let bIndex = dayOrder.indexOf(b.classDay);
+    let aDaysAhead = (aIndex - todayIndex + 7) % 7;
+    let bDaysAhead = (bIndex - todayIndex + 7) % 7;
+    return aDaysAhead - bDaysAhead;
+  });
+
+  let upcomingClasses = sortedClasses.slice(0, 3);
+
+  if (upcomingClasses.length === 0) {
+    if (emptyMessage) emptyMessage.style.display = "flex";
+    container.innerHTML = "";
+    return;
+  }
+
+  if (emptyMessage) emptyMessage.style.display = "none";
+
+  let shortDayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  let html = "";
+
+  for (let cls of upcomingClasses) {
+    let dayIndex = dayOrder.indexOf(cls.classDay);
+    let daysAhead = (dayIndex - todayIndex + 7) % 7;
+
+    let targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() + daysAhead);
+
+    html += `
+      <div class="upcoming-item">
+        <div class="upcoming-day">
+          <div class="upcoming-day-num">${targetDate.getDate()}</div>
+          <div class="upcoming-day-label">${shortDayNames[targetDate.getDay()]}</div>
+        </div>
+        <div class="upcoming-divider"></div>
+        <div class="upcoming-info">
+          <div class="upcoming-name">${cls.className || "—"}</div>
+          <div class="upcoming-meta">
+            <i class="fa-solid fa-user-tie" style="color:var(--gold);margin-right:4px;font-size:11px"></i>
+            ${cls.classTrainer || "TBA"} &nbsp;·&nbsp; ${cls.classDuration || "—"} min
+          </div>
+        </div>
+        <div class="upcoming-time">${cls.classTime || "--:--"}</div>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
+};
+
+// ============================================
+// TAB LISTENERS
+// ============================================
+function setupTabListeners() {
+  let allTabButtons = document.querySelectorAll(".tab-btn");
+  let allPanels = document.querySelectorAll(".tab-panel");
+
+  for (let i = 0; i < allTabButtons.length; i++) {
+    allTabButtons[i].addEventListener("click", function () {
+      let tabName = this.dataset.tab;
+
+      for (let j = 0; j < allTabButtons.length; j++) {
+        allTabButtons[j].classList.remove("active");
+      }
+      for (let j = 0; j < allPanels.length; j++) {
+        allPanels[j].classList.remove("active");
+      }
+
+      this.classList.add("active");
+
+      let panelToShow = document.getElementById("panel-" + tabName);
+      if (panelToShow) panelToShow.classList.add("active");
+
+      if (tabName === "attendance") {
+        renderCalendar();
+        renderAttendanceTable();
+        updateAttendanceSummary();
+      }
+      if (tabName === "schedule") {
+        renderClassSchedule("all");
+        let dayTabs = document.querySelectorAll(".day-tab");
+        for (let k = 0; k < dayTabs.length; k++) {
+          dayTabs[k].classList.remove("active");
+        }
+        let allDayTab = document.querySelector('.day-tab[data-day="all"]');
+        if (allDayTab) allDayTab.classList.add("active");
+      }
+      if (tabName === "profile") {
+        loadProfileForm();
+      }
+    });
+  }
+
+  // Set Overview as active on page load
+  let panelOverview = document.getElementById("panel-overview");
+  if (panelOverview) panelOverview.classList.add("active");
+
+  let tabOverview = document.getElementById("tabOverview");
+  if (tabOverview) tabOverview.classList.add("active");
+}
+
+// ============================================
+// DAY TABS FOR SCHEDULE
+// ============================================
+function setupDayTabs() {
+  let dayTabs = document.querySelectorAll(".day-tab");
+  for (let i = 0; i < dayTabs.length; i++) {
+    dayTabs[i].addEventListener("click", function () {
+      for (let j = 0; j < dayTabs.length; j++) {
+        dayTabs[j].classList.remove("active");
+      }
+      this.classList.add("active");
+      renderClassSchedule(this.dataset.day);
+    });
+  }
+}
+
+// ============================================
+// MONTH FILTER FOR ATTENDANCE
+// ============================================
+function setupMonthFilter() {
+  let attMonthFilter = document.getElementById("attMonthFilter");
+  if (attMonthFilter) {
+    attMonthFilter.value = String(new Date().getMonth() + 1);
+    attMonthFilter.addEventListener("change", function (e) {
+      renderAttendanceTable(e.target.value);
+    });
+  }
+}
+
+// ============================================
+// CALENDAR NAVIGATION
+// ============================================
+function setupCalendarNav() {
+  let calPrevBtn = document.getElementById("calPrev");
+  let calNextBtn = document.getElementById("calNext");
+
+  if (calPrevBtn) {
+    calPrevBtn.addEventListener("click", function () {
+      calMonth--;
+      if (calMonth < 0) {
+        calMonth = 11;
+        calYear--;
+      }
+      renderCalendar();
+    });
+  }
+
+  if (calNextBtn) {
+    calNextBtn.addEventListener("click", function () {
+      calMonth++;
+      if (calMonth > 11) {
+        calMonth = 0;
+        calYear++;
+      }
+      renderCalendar();
+    });
+  }
+}
+
+// ============================================
+// LOGOUT
+// ============================================
+function setupLogout() {
+  let logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", function () {
+      localStorage.removeItem("currentMember");
+      localStorage.removeItem("currentUser");
+      window.location.href = "login.html";
+    });
+  }
+}
+
+// ============================================
+// GO TO SCHEDULE BUTTON
+// ============================================
+function setupGoToSchedule() {
+  let goToScheduleBtn = document.getElementById("goToSchedule");
+  let allTabButtons = document.querySelectorAll(".tab-btn");
+  let allPanels = document.querySelectorAll(".tab-panel");
+  let dayTabs = document.querySelectorAll(".day-tab");
+
+  if (goToScheduleBtn) {
+    goToScheduleBtn.addEventListener("click", function () {
+      for (let i = 0; i < allTabButtons.length; i++) {
+        allTabButtons[i].classList.remove("active");
+      }
+      for (let i = 0; i < allPanels.length; i++) {
+        allPanels[i].classList.remove("active");
+      }
+
+      let tabSchedule = document.getElementById("tabSchedule");
+      let panelSchedule = document.getElementById("panel-schedule");
+      if (tabSchedule) tabSchedule.classList.add("active");
+      if (panelSchedule) panelSchedule.classList.add("active");
+
+      for (let i = 0; i < dayTabs.length; i++) {
+        dayTabs[i].classList.remove("active");
+      }
+      let allDayTab = document.querySelector('.day-tab[data-day="all"]');
+      if (allDayTab) allDayTab.classList.add("active");
+
+      renderClassSchedule("all");
+    });
+  }
+}
+
+// ============================================
+// CHANGE PLAN BUTTON
+// ============================================
 let selectedNewPlanId = "";
+
+function setupChangePlan() {
+  let changePlanBtn = document.getElementById("changePlanBtn");
+  if (changePlanBtn) {
+    changePlanBtn.addEventListener("click", showPlanSelector);
+  }
+
+  let renewBtn = document.getElementById("renewBtn");
+  if (renewBtn) {
+    renewBtn.addEventListener("click", function () {
+      editProfile();
+      setTimeout(showPlanSelector, 300);
+    });
+  }
+}
 
 const showPlanSelector = () => {
   let existingSelector = document.getElementById("inlinePlanSelector");
@@ -560,7 +1100,7 @@ const showPlanSelector = () => {
   }
 };
 
-const selectNewPlan = (planId) => {
+window.selectNewPlan = (planId) => {
   selectedNewPlanId = planId;
 
   let basicOpt = document.getElementById("planOption_basic");
@@ -587,25 +1127,23 @@ const selectNewPlan = (planId) => {
   }
 };
 
-const confirmPlanChange = () => {
+const confirmPlanChange = async () => {
   if (selectedNewPlanId === "") {
     showToast("Please select a plan.", false);
     return;
   }
 
-  currentMember = JSON.parse(localStorage.getItem("currentMember"));
   currentMember.membership.selectedPlan = selectedNewPlanId;
   currentMember.membership.startDate = new Date().toISOString();
   localStorage.setItem("currentMember", JSON.stringify(currentMember));
 
-  let allMembers = JSON.parse(localStorage.getItem("memberDetailsArray"));
   let memberIndex = allMembers.findIndex(
     (member) => member.loginInfo.userName === currentMember.loginInfo.userName,
   );
   allMembers[memberIndex].membership.selectedPlan = selectedNewPlanId;
   allMembers[memberIndex].membership.startDate =
     currentMember.membership.startDate;
-  localStorage.setItem("memberDetailsArray", JSON.stringify(allMembers));
+  await set(ref(db, "members"), allMembers);
 
   let selector = document.getElementById("inlinePlanSelector");
   if (selector) selector.remove();
@@ -616,28 +1154,6 @@ const confirmPlanChange = () => {
   initMembershipCard();
   membershipDetailsDisplay();
 
-  // Switch back to Overview tab
-  let allTabButtons = document.querySelectorAll(".tab-btn");
-  let allPanels = document.querySelectorAll(".tab-panel");
-
-  for (let i = 0; i < allTabButtons.length; i++) {
-    allTabButtons[i].classList.remove("active");
-  }
-  for (let i = 0; i < allPanels.length; i++) {
-    allPanels[i].classList.remove("active");
-  }
-
-  let tabOverview = document.getElementById("tabOverview");
-  let panelOverview = document.getElementById("panel-overview");
-  if (tabOverview) tabOverview.classList.add("active");
-  if (panelOverview) panelOverview.classList.add("active");
-
-  setGreeting();
-  setNavUser();
-  displayWelcomeName();
-  showInfo();
-  renderUpcomingClasses();
-
   let planName =
     selectedNewPlanId.charAt(0).toUpperCase() + selectedNewPlanId.slice(1);
   showToast("Plan changed to " + planName + "!");
@@ -646,621 +1162,46 @@ const confirmPlanChange = () => {
 };
 
 // ============================================
-// SET UP BUTTONS
+// START THE APP
 // ============================================
-
-let changePlanBtn = document.getElementById("changePlanBtn");
-if (changePlanBtn) changePlanBtn.addEventListener("click", showPlanSelector);
-
-let renewBtn = document.getElementById("renewBtn");
-if (renewBtn) {
-  renewBtn.addEventListener("click", function () {
-    editProfile();
-    setTimeout(showPlanSelector, 300);
-  });
-}
-
-// ============================================
-// TAB SWITCHING
-// ============================================
-
-let allTabButtons = document.querySelectorAll(".tab-btn");
-let allPanels = document.querySelectorAll(".tab-panel");
-
-for (let i = 0; i < allTabButtons.length; i++) {
-  allTabButtons[i].addEventListener("click", function () {
-    let tabName = this.dataset.tab;
-
-    for (let j = 0; j < allTabButtons.length; j++) {
-      allTabButtons[j].classList.remove("active");
-    }
-    for (let j = 0; j < allPanels.length; j++) {
-      allPanels[j].classList.remove("active");
-    }
-
-    this.classList.add("active");
-
-    let panelToShow = document.getElementById("panel-" + tabName);
-    if (panelToShow) panelToShow.classList.add("active");
-
-    if (tabName === "attendance") {
-      renderCalendar();
-      renderAttendanceTable();
-      updateAttendanceSummary();
-    }
-    if (tabName === "schedule") {
-      renderClassSchedule("all");
-      let dayTabs = document.querySelectorAll(".day-tab");
-      for (let k = 0; k < dayTabs.length; k++) {
-        dayTabs[k].classList.remove("active");
-      }
-      let allDayTab = document.querySelector('.day-tab[data-day="all"]');
-      if (allDayTab) allDayTab.classList.add("active");
-    }
-    if (tabName === "profile") {
-      loadProfileForm();
-    }
-  });
-}
-
-// Set Overview as active on page load
-for (let i = 0; i < allPanels.length; i++) {
-  allPanels[i].classList.remove("active");
-}
-let panelOverview = document.getElementById("panel-overview");
-if (panelOverview) panelOverview.classList.add("active");
-
-for (let i = 0; i < allTabButtons.length; i++) {
-  allTabButtons[i].classList.remove("active");
-}
-let tabOverview = document.getElementById("tabOverview");
-if (tabOverview) tabOverview.classList.add("active");
-
-// ============================================
-// ATTENDANCE - GET MY ATTENDANCE DATES
-// ============================================
-
-let calYear = new Date().getFullYear();
-let calMonth = new Date().getMonth();
-
-const getMyAttendanceDates = () => {
-  let currentMemberData = JSON.parse(localStorage.getItem("currentMember"));
-  let allAttendance = JSON.parse(localStorage.getItem("attendance")) || [];
-
-  if (!currentMemberData || !currentMemberData.personalInfo) return [];
-
-  let firstName = currentMemberData.personalInfo.firstName;
-  let lastName = currentMemberData.personalInfo.lastName;
-  let myFullName = firstName + " " + lastName;
-
-  let myRecords = [];
-  for (let i = 0; i < allAttendance.length; i++) {
-    if (allAttendance[i][0] === myFullName) {
-      myRecords.push(allAttendance[i][2]);
-    }
-  }
-
-  return myRecords;
-};
-
-// ============================================
-// ATTENDANCE - CALENDAR
-// ============================================
-
-const renderCalendar = () => {
-  let monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  let calTitle = document.getElementById("calMonthTitle");
-  if (calTitle) calTitle.innerText = monthNames[calMonth] + " " + calYear;
-
-  let grid = document.getElementById("calendarGrid");
-  if (!grid) return;
-  grid.innerHTML = "";
-
-  let presentDates = getMyAttendanceDates();
-  let today = new Date();
-
-  let firstDayOfMonth = new Date(calYear, calMonth, 1).getDay();
-  let daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-
-  for (let i = 0; i < firstDayOfMonth; i++) {
-    let emptyCell = document.createElement("div");
-    emptyCell.className = "cal-day empty";
-    grid.appendChild(emptyCell);
-  }
-
-  for (let day = 1; day <= daysInMonth; day++) {
-    let cell = document.createElement("div");
-    cell.className = "cal-day";
-    cell.innerText = day;
-
-    let monthNumber = String(calMonth + 1).padStart(2, "0");
-    let dayNumber = String(day).padStart(2, "0");
-    let dateString = calYear + "-" + monthNumber + "-" + dayNumber;
-
-    let isToday =
-      day === today.getDate() &&
-      calMonth === today.getMonth() &&
-      calYear === today.getFullYear();
-
-    let cellDate = new Date(calYear, calMonth, day);
-    let todayDate = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate(),
-    );
-    let isPast = cellDate < todayDate;
-
-    if (isToday) cell.classList.add("today");
-
-    let didAttend = false;
-    for (let i = 0; i < presentDates.length; i++) {
-      if (presentDates[i] === dateString) {
-        didAttend = true;
-        break;
-      }
-    }
-
-    if (didAttend) {
-      cell.classList.add("present");
-    } else if (isPast && !isToday) {
-      cell.classList.add("absent");
-    }
-
-    grid.appendChild(cell);
-  }
-};
-
-let calPrevBtn = document.getElementById("calPrev");
-let calNextBtn = document.getElementById("calNext");
-
-if (calPrevBtn) {
-  calPrevBtn.addEventListener("click", function () {
-    calMonth--;
-    if (calMonth < 0) {
-      calMonth = 11;
-      calYear--;
-    }
-    renderCalendar();
-  });
-}
-
-if (calNextBtn) {
-  calNextBtn.addEventListener("click", function () {
-    calMonth++;
-    if (calMonth > 11) {
-      calMonth = 0;
-      calYear++;
-    }
-    renderCalendar();
-  });
-}
-
-// ============================================
-// ATTENDANCE - SUMMARY STATS
-// ============================================
-
-const updateAttendanceSummary = () => {
-  let presentDates = getMyAttendanceDates();
-  let totalVisits = presentDates.length;
-  let now = new Date();
-
-  let visitsThisMonth = 0;
-  for (let i = 0; i < presentDates.length; i++) {
-    let date = new Date(presentDates[i]);
-    if (
-      date.getMonth() === now.getMonth() &&
-      date.getFullYear() === now.getFullYear()
-    ) {
-      visitsThisMonth++;
-    }
-  }
-
-  let streak = 0;
-  let checkDate = new Date(now);
-  checkDate.setHours(0, 0, 0, 0);
-
-  let dateSet = {};
-  for (let i = 0; i < presentDates.length; i++) {
-    dateSet[presentDates[i]] = true;
-  }
-
-  let keepChecking = true;
-  while (keepChecking) {
-    let year = checkDate.getFullYear();
-    let month = String(checkDate.getMonth() + 1).padStart(2, "0");
-    let day = String(checkDate.getDate()).padStart(2, "0");
-    let dateString = year + "-" + month + "-" + day;
-
-    if (dateSet[dateString]) {
-      streak++;
-      checkDate.setDate(checkDate.getDate() - 1);
-    } else {
-      keepChecking = false;
-    }
-  }
-
-  let joinDate = new Date(currentMember.membership.startDate);
-  let daysSinceJoin = Math.floor((now - joinDate) / (1000 * 60 * 60 * 24)) + 1;
-  let attendanceRate = Math.min(
-    100,
-    Math.round((totalVisits / daysSinceJoin) * 100),
-  );
-
-  let attTotal = document.getElementById("attTotal");
-  let attThisMonth = document.getElementById("attThisMonth");
-  let attStreak = document.getElementById("attStreak");
-  let attRate = document.getElementById("attRate");
-  let statTotalAttendance = document.getElementById("statTotalAttendance");
-  let statStreak = document.getElementById("statStreak");
-  let statClassesJoined = document.getElementById("statClassesJoined");
-
-  if (attTotal) attTotal.innerText = totalVisits;
-  if (attThisMonth) attThisMonth.innerText = visitsThisMonth;
-  if (attStreak) attStreak.innerText = streak;
-  if (attRate) attRate.innerText = attendanceRate + "%";
-  if (statTotalAttendance) statTotalAttendance.innerText = visitsThisMonth;
-  if (statStreak) statStreak.innerText = streak;
-  if (statClassesJoined) statClassesJoined.innerText = totalVisits;
-};
-
-// ============================================
-// ATTENDANCE - TABLE LOG
-// ============================================
-
-const renderAttendanceTable = (filterMonth) => {
-  if (filterMonth === undefined) filterMonth = "all";
-
-  let currentMemberData = JSON.parse(localStorage.getItem("currentMember"));
-  let allAttendance = JSON.parse(localStorage.getItem("attendance")) || [];
-
-  if (!currentMemberData || !currentMemberData.personalInfo) return;
-
-  let firstName = currentMemberData.personalInfo.firstName;
-  let lastName = currentMemberData.personalInfo.lastName;
-  let myFullName = firstName + " " + lastName;
-
-  let myRecords = [];
-  for (let i = 0; i < allAttendance.length; i++) {
-    if (allAttendance[i][0] === myFullName) {
-      myRecords.push(allAttendance[i]);
-    }
-  }
-
-  if (filterMonth !== "all") {
-    let filteredRecords = [];
-    for (let i = 0; i < myRecords.length; i++) {
-      let recordDate = new Date(myRecords[i][2]);
-      if (recordDate.getMonth() + 1 === Number(filterMonth)) {
-        filteredRecords.push(myRecords[i]);
-      }
-    }
-    myRecords = filteredRecords;
-  }
-
-  myRecords.sort(function (a, b) {
-    return new Date(b[2]) - new Date(a[2]);
-  });
-
-  let tbody = document.getElementById("attendanceTableBody");
-  let emptyMessage = document.getElementById("attendanceEmpty");
-
-  if (!tbody) return;
-
-  if (myRecords.length === 0) {
-    tbody.innerHTML = "";
-    if (emptyMessage) emptyMessage.style.display = "flex";
-    return;
-  }
-
-  if (emptyMessage) emptyMessage.style.display = "none";
-
-  let dayNames = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-  let html = "";
-
-  for (let i = 0; i < myRecords.length; i++) {
-    let record = myRecords[i];
-    let date = new Date(record[2]);
-    let dayName = dayNames[date.getDay()];
-    let displayDate = date.toDateString();
-    let planName = record[1];
-    let formattedPlan = planName.charAt(0).toUpperCase() + planName.slice(1);
-
-    html += `<tr>
-      <td>${i + 1}</td>
-      <td><span class="td-main">${displayDate}</span></td>
-      <td>${dayName}</td>
-      <td>—</td>
-      <td>—</td>
-      <td>${formattedPlan}</td>
-      <td><span class="status-pill pill-active"><span class="dot"></span> Present</span></td>
-    </tr>`;
-  }
-
-  tbody.innerHTML = html;
-};
-
-let attMonthFilter = document.getElementById("attMonthFilter");
-if (attMonthFilter) {
-  attMonthFilter.value = String(new Date().getMonth() + 1);
-  attMonthFilter.addEventListener("change", function (e) {
-    renderAttendanceTable(e.target.value);
-  });
-}
-
-// ============================================
-// CLASS SCHEDULE
-// ============================================
-
-const renderClassSchedule = (dayFilter) => {
-  if (dayFilter === undefined) dayFilter = "all";
-
-  let classDetails = JSON.parse(localStorage.getItem("classDetails")) || [];
-  let container = document.getElementById("classList");
-  let emptyMessage = document.getElementById("scheduleEmpty");
-
-  let filteredClasses = [];
-  if (dayFilter === "all") {
-    filteredClasses = classDetails;
+async function startApp() {
+  // Wait for Firebase to be ready
+  if (window.db && window.get && window.child && window.ref) {
+    db = window.db;
+    await loadFirebaseData();
   } else {
-    for (let i = 0; i < classDetails.length; i++) {
-      if (classDetails[i].classDay === dayFilter) {
-        filteredClasses.push(classDetails[i]);
+    const waitForFirebase = setInterval(async () => {
+      if (window.db && window.get && window.child && window.ref) {
+        db = window.db;
+        clearInterval(waitForFirebase);
+        await loadFirebaseData();
       }
-    }
+    }, 100);
+
+    // Timeout after 5 seconds
+    setTimeout(() => {
+      if (!db) {
+        console.error("Firebase not loaded!");
+        showToast("Error loading data. Please refresh the page.", false);
+      }
+    }, 5000);
   }
 
-  if (!container) return;
-
-  if (filteredClasses.length === 0) {
-    container.innerHTML = "";
-    if (emptyMessage) emptyMessage.style.display = "flex";
-    return;
-  }
-
-  if (emptyMessage) emptyMessage.style.display = "none";
-
-  let html = "";
-
-  for (let i = 0; i < filteredClasses.length; i++) {
-    let cls = filteredClasses[i];
-
-    let typeClass = "yoga";
-    let tagClass = "tag-yoga";
-    let typeLabel = cls.classType;
-
-    if (cls.classType === "yoga") {
-      typeClass = "yoga";
-      tagClass = "tag-yoga";
-      typeLabel = "Yoga";
-    } else if (cls.classType === "zumba") {
-      typeClass = "hiit";
-      tagClass = "tag-hiit";
-      typeLabel = "Zumba";
-    } else if (cls.classType === "weight") {
-      typeClass = "strength";
-      tagClass = "tag-strength";
-      typeLabel = "Weight Training";
-    } else if (cls.classType === "aerobics") {
-      typeClass = "cardio";
-      tagClass = "tag-cardio";
-      typeLabel = "Aerobics";
-    } else if (cls.classType === "hiit") {
-      typeClass = "hiit";
-      tagClass = "tag-hiit";
-      typeLabel = "HIIT";
-    }
-
-    let endTimeDisplay = "";
-    if (cls.classTime && cls.classDuration) {
-      let timeParts = cls.classTime.split(":");
-      let hour = Number(timeParts[0]);
-      let minute = Number(timeParts[1]);
-      let totalMinutes = hour * 60 + minute + Number(cls.classDuration);
-      let endHour = Math.floor(totalMinutes / 60) % 24;
-      let endMinute = totalMinutes % 60;
-      endTimeDisplay =
-        String(endHour).padStart(2, "0") +
-        ":" +
-        String(endMinute).padStart(2, "0");
-    }
-
-    let className = cls.className || "—";
-    let classTime = cls.classTime || "—";
-    let classTrainer = cls.classTrainer || "TBA";
-    let classCapacity = cls.classCapacity || "—";
-    let classDay = cls.classDay;
-    let formattedDay = classDay.charAt(0).toUpperCase() + classDay.slice(1);
-
-    html += `
-      <div class="class-item ${typeClass}" data-day="${classDay}">
-        <div class="class-time">
-          <div class="class-time-start">${classTime}</div>
-          <div class="class-time-end">${endTimeDisplay}</div>
-          <div class="class-time-end" style="font-size:10px;margin-top:4px;color:var(--w35)">${formattedDay}</div>
-        </div>
-        <div class="class-info">
-          <div class="class-name">${className}</div>
-          <div class="class-trainer"><i class="fa-solid fa-user-tie"></i> ${classTrainer}</div>
-          <div class="class-tags"><span class="class-tag ${tagClass}">${typeLabel}</span></div>
-        </div>
-        <div class="class-slots">
-          <div class="class-slots-num">${classCapacity}</div>
-          <div class="class-slots-label">capacity</div>
-        </div>
-      </div>
-    `;
-  }
-
-  container.innerHTML = html;
-};
-
-let dayTabs = document.querySelectorAll(".day-tab");
-
-for (let i = 0; i < dayTabs.length; i++) {
-  dayTabs[i].addEventListener("click", function () {
-    for (let j = 0; j < dayTabs.length; j++) {
-      dayTabs[j].classList.remove("active");
-    }
-    this.classList.add("active");
-    renderClassSchedule(this.dataset.day);
-  });
+  // Setup event listeners
+  setupDayTabs();
+  setupMonthFilter();
+  setupCalendarNav();
+  setupGoToSchedule();
+  setupChangePlan();
 }
 
-let goToScheduleBtn = document.getElementById("goToSchedule");
-if (goToScheduleBtn) {
-  goToScheduleBtn.addEventListener("click", function () {
-    for (let i = 0; i < allTabButtons.length; i++) {
-      allTabButtons[i].classList.remove("active");
-    }
-    for (let i = 0; i < allPanels.length; i++) {
-      allPanels[i].classList.remove("active");
-    }
+// Start the application
+startApp();
 
-    let tabSchedule = document.getElementById("tabSchedule");
-    let panelSchedule = document.getElementById("panel-schedule");
-    if (tabSchedule) tabSchedule.classList.add("active");
-    if (panelSchedule) panelSchedule.classList.add("active");
-
-    for (let i = 0; i < dayTabs.length; i++) {
-      dayTabs[i].classList.remove("active");
-    }
-    let allDayTab = document.querySelector('.day-tab[data-day="all"]');
-    if (allDayTab) allDayTab.classList.add("active");
-
-    renderClassSchedule("all");
-  });
-}
-
-// ============================================
-// UPCOMING CLASSES (Overview)
-// ============================================
-
-const renderUpcomingClasses = () => {
-  let classDetails = JSON.parse(localStorage.getItem("classDetails")) || [];
-  let container = document.getElementById("upcomingList");
-  let emptyMessage = document.getElementById("upcomingEmpty");
-
-  if (!container) return;
-
-  if (classDetails.length === 0) {
-    if (emptyMessage) emptyMessage.style.display = "flex";
-    container.innerHTML = "";
-    return;
-  }
-
-  let dayOrder = [
-    "sunday",
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday",
-  ];
-  let todayIndex = new Date().getDay();
-
-  let sortedClasses = [...classDetails];
-  sortedClasses.sort(function (a, b) {
-    let aIndex = dayOrder.indexOf(a.classDay);
-    let bIndex = dayOrder.indexOf(b.classDay);
-    let aDaysAhead = (aIndex - todayIndex + 7) % 7;
-    let bDaysAhead = (bIndex - todayIndex + 7) % 7;
-    return aDaysAhead - bDaysAhead;
-  });
-
-  let upcomingClasses = [];
-  for (let i = 0; i < sortedClasses.length && i < 3; i++) {
-    upcomingClasses.push(sortedClasses[i]);
-  }
-
-  if (upcomingClasses.length === 0) {
-    if (emptyMessage) emptyMessage.style.display = "flex";
-    container.innerHTML = "";
-    return;
-  }
-
-  if (emptyMessage) emptyMessage.style.display = "none";
-
-  let shortDayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  let html = "";
-
-  for (let i = 0; i < upcomingClasses.length; i++) {
-    let cls = upcomingClasses[i];
-    let dayIndex = dayOrder.indexOf(cls.classDay);
-    let daysAhead = (dayIndex - todayIndex + 7) % 7;
-
-    let targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() + daysAhead);
-
-    let classTime = cls.classTime || "—";
-    let className = cls.className;
-    let classTrainer = cls.classTrainer || "TBA";
-    let classDuration = cls.classDuration || "—";
-
-    html += `
-      <div class="upcoming-item">
-        <div class="upcoming-day">
-          <div class="upcoming-day-num">${targetDate.getDate()}</div>
-          <div class="upcoming-day-label">${shortDayNames[targetDate.getDay()]}</div>
-        </div>
-        <div class="upcoming-divider"></div>
-        <div class="upcoming-info">
-          <div class="upcoming-name">${className}</div>
-          <div class="upcoming-meta">
-            <i class="fa-solid fa-user-tie" style="color:var(--gold);margin-right:4px;font-size:11px"></i>
-            ${classTrainer} &nbsp;·&nbsp; ${classDuration} min
-          </div>
-        </div>
-        <div class="upcoming-time">${classTime}</div>
-      </div>
-    `;
-  }
-
-  container.innerHTML = html;
-};
-
-// ============================================
-// LOGOUT
-// ============================================
-
-let logoutBtn = document.getElementById("logoutBtn");
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", function () {
-    localStorage.removeItem("currentMember");
-    window.location.href = "login.html";
-  });
-}
-
-// ============================================
-// INITIALIZATION
-// ============================================
-
-displayWelcomeName();
-renderCalendar();
-renderAttendanceTable();
-updateAttendanceSummary();
-renderClassSchedule("all");
-renderUpcomingClasses();
-membershipDetailsDisplay();
+// Make functions available globally for onclick
+window.saveChanges = saveChanges;
+window.updatePassword = updatePassword;
+window.editProfile = editProfile;
+window.selectPlan = window.selectNewPlan;
+window.confirmPlanChange = confirmPlanChange;
+window.showPlanSelector = showPlanSelector;

@@ -1,37 +1,42 @@
-// TRAINER DASHBOARD JS
+// TRAINER DASHBOARD JS - WITH FIREBASE
 // ============================================
 
 // ============================================
-// SECURITY CHECK - PREVENT DIRECT ACCESS
+// FIREBASE REFERENCE
+// ============================================
+let db = window.db;
+
+// ============================================
+// STORED DATA - Will be loaded from Firebase
+// ============================================
+let allMembers = [];
+let classDetails = [];
+let attendanceRecords = [];
+let trainerDetails = [];
+
+// ============================================
+// SECURITY CHECK - FIXED
 // ============================================
 
 let currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-// If no user is logged in, redirect to login page
+// If no user is logged in, go to login page
 if (!currentUser) {
   window.location.href = "login.html";
   throw new Error("Access denied. Please login first.");
 }
 
-// If logged in but not trainer, redirect to appropriate dashboard
+// If logged in but NOT trainer, go to login page
 if (currentUser.role !== "trainer") {
-  if (currentUser.role === "admin") {
-    window.location.href = "admin-dashboard.html";
-  } else if (currentUser.role === "member") {
-    window.location.href = "member-dashboard.html";
-  } else {
-    window.location.href = "login.html";
-  }
-  throw new Error("Unauthorized access.");
+  // Clear the invalid session
+  localStorage.removeItem("currentUser");
+  localStorage.removeItem("currentMember");
+  // Redirect to login page
+  window.location.href = "login.html";
+  throw new Error("Unauthorized access. Please login as trainer.");
 }
 
-console.log(`✅ Logged in as Trainer: ${currentUser.name}`);
-
-// STORED DATA
-let allMembers = JSON.parse(localStorage.getItem("memberDetailsArray")) || [];
-let classDetails = JSON.parse(localStorage.getItem("classDetails")) || [];
-let attendanceRecords = JSON.parse(localStorage.getItem("attendance")) || [];
-let trainerDetails = JSON.parse(localStorage.getItem("TrainerDetails")) || [];
+console.log("✅ Logged in as Trainer:", currentUser.name);
 
 // CURRENT TRAINER
 let currentTrainer = JSON.parse(localStorage.getItem("currentUser"));
@@ -43,11 +48,60 @@ if (!currentTrainer || currentTrainer.role !== "trainer") {
 
 // GET TRAINER FULL DATA
 let loggedInTrainer = null;
-for (let trainer of trainerDetails) {
-  if (trainer.traineruserName === currentTrainer.name) {
-    loggedInTrainer = trainer;
-    break;
+
+// ============================================
+// LOAD DATA FROM FIREBASE
+// ============================================
+
+async function loadFirebaseData() {
+  console.log("Loading trainer data from Firebase...");
+
+  const membersSnapshot = await get(child(ref(db), "members"));
+  if (membersSnapshot.exists()) {
+    allMembers = membersSnapshot.val();
   }
+
+  const classesSnapshot = await get(child(ref(db), "classes"));
+  if (classesSnapshot.exists()) {
+    classDetails = classesSnapshot.val();
+  }
+
+  const attendanceSnapshot = await get(child(ref(db), "attendance"));
+  if (attendanceSnapshot.exists()) {
+    attendanceRecords = attendanceSnapshot.val();
+  }
+
+  const trainersSnapshot = await get(child(ref(db), "trainers"));
+  if (trainersSnapshot.exists()) {
+    trainerDetails = trainersSnapshot.val();
+  }
+
+  // Find logged in trainer
+  for (let trainer of trainerDetails) {
+    if (trainer.traineruserName === currentTrainer.name) {
+      loggedInTrainer = trainer;
+      break;
+    }
+  }
+
+  console.log("Trainer data loaded from Firebase!");
+
+  // Initialize dashboard after data is loaded
+  init();
+}
+
+// ============================================
+// SAVE DATA TO FIREBASE
+// ============================================
+
+async function saveTrainersToFirebase() {
+  await set(ref(db, "trainers"), trainerDetails);
+  console.log("Trainers saved to Firebase");
+}
+
+async function saveAttendanceToFirebase() {
+  await set(ref(db, "attendance"), attendanceRecords);
+  console.log("Attendance saved to Firebase");
 }
 
 // HELPER: Get trainer's full name
@@ -879,7 +933,7 @@ document
   ?.addEventListener("change", renderAttendanceLog);
 
 // ============================================
-// PROFILE PAGE - SAVE FUNCTIONS
+// PROFILE PAGE - SAVE FUNCTIONS (UPDATED FOR FIREBASE)
 // ============================================
 const showToast = (message, isError = false) => {
   const toast = document.getElementById("toast");
@@ -891,7 +945,7 @@ const showToast = (message, isError = false) => {
   setTimeout(() => toast.classList.remove("show"), 3000);
 };
 
-document.getElementById("saveProfile")?.addEventListener("click", () => {
+document.getElementById("saveProfile")?.addEventListener("click", async () => {
   if (!loggedInTrainer) {
     showToast("Trainer data not found", true);
     return;
@@ -913,7 +967,7 @@ document.getElementById("saveProfile")?.addEventListener("click", () => {
   );
   if (index !== -1) {
     trainerDetails[index] = updatedTrainer;
-    localStorage.setItem("TrainerDetails", JSON.stringify(trainerDetails));
+    await saveTrainersToFirebase();
     loggedInTrainer = updatedTrainer;
     loadTrainerProfile();
     showToast("Profile updated successfully!");
@@ -922,7 +976,7 @@ document.getElementById("saveProfile")?.addEventListener("click", () => {
   }
 });
 
-document.getElementById("savePw")?.addEventListener("click", () => {
+document.getElementById("savePw")?.addEventListener("click", async () => {
   const currentPw = document.getElementById("editCurPw").value;
   const newPw = document.getElementById("editNewPw").value;
   const confirmPw = document.getElementById("editConfPw").value;
@@ -947,7 +1001,7 @@ document.getElementById("savePw")?.addEventListener("click", () => {
   );
   if (index !== -1) {
     trainerDetails[index].trainerPassword = newPw;
-    localStorage.setItem("TrainerDetails", JSON.stringify(trainerDetails));
+    await saveTrainersToFirebase();
     loggedInTrainer.trainerPassword = newPw;
     showToast("Password updated successfully!");
     document.getElementById("editCurPw").value = "";
@@ -970,6 +1024,51 @@ const init = () => {
   renderAttendanceLog();
 };
 
-init();
+// ============================================
+// START: Wait for Firebase then load data
+// ============================================
+async function startTrainerDashboard() {
+  if (window.db) {
+    db = window.db;
+    await loadFirebaseData();
+  } else {
+    const waitForFirebase = setInterval(async () => {
+      if (window.db) {
+        db = window.db;
+        clearInterval(waitForFirebase);
+        await loadFirebaseData();
+      }
+    }, 100);
+  }
+}
 
-console.log("bae");
+startTrainerDashboard();
+
+console.log("Trainer dashboard with Firebase initialized");
+
+// Close sidebar button functionality
+const closeSidebarBtn = document.getElementById("closeSidebarBtn");
+if (closeSidebarBtn) {
+  closeSidebarBtn.addEventListener("click", function () {
+    const sidebar = document.getElementById("sidebar");
+    if (sidebar) {
+      sidebar.classList.remove("open");
+    }
+  });
+}
+
+// Optional: Close sidebar when clicking outside on mobile
+document.addEventListener("click", function (e) {
+  const sidebar = document.getElementById("sidebar");
+  const menuToggle = document.getElementById("menuToggle");
+
+  if (
+    window.innerWidth <= 768 &&
+    sidebar &&
+    sidebar.classList.contains("open")
+  ) {
+    if (!sidebar.contains(e.target) && !menuToggle?.contains(e.target)) {
+      sidebar.classList.remove("open");
+    }
+  }
+});

@@ -2168,6 +2168,435 @@
           grid-template-columns: 1fr;
         }
       }
+      /* Mobile close button - only visible on mobile */
+      .sb-mobile-close {
+        display: none;
+        justify-content: flex-end;
+        padding: 12px 16px 0 0;
+      }
+
+      .sb-close-btn {
+        background: none;
+        border: none;
+        color: var(--w50);
+        font-size: 22px;
+        cursor: pointer;
+        padding: 8px;
+      }
+
+      .sb-close-btn:hover {
+        color: var(--gold);
+      }
+
+      /* Show close button only on mobile */
+      @media (max-width: 768px) {
+        .sb-mobile-close {
+          display: flex;
+        }
+      }
+
+      /* ============================================
+   RESPONSIVE TABLES - ADMIN DASHBOARD
+   ============================================ */
+
+      /* Make all table containers scroll horizontally */
+      .table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        border-radius: var(--r-md);
+      }
+
+      /* Ensure all tables have minimum width to prevent squishing */
+      .table-wrap table {
+        min-width: 650px;
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      /* Specific tables that need different min-widths */
+      #membersTable,
+      #trainerAssignBody + table,
+      #paymentTableBody + table,
+      #attChecklistBody + table,
+      #classTableBody + table,
+      #attendanceTable,
+      #revenueBreakdownBody + table,
+      #classPopularityBody + table {
+        min-width: 600px;
+      }
+
+      /* Attendance checklist table needs smaller min-width on mobile */
+      #attChecklistBody + table {
+        min-width: 500px;
+      }
+
+      /* Table cells - ensure proper padding */
+      table th,
+      table td {
+        padding: 10px 12px;
+        white-space: nowrap;
+      }
+
+      /* Allow some cells to wrap on very small screens */
+      @media (max-width: 480px) {
+        table td,
+        table th {
+          white-space: normal;
+          word-break: break-word;
+        }
+      }
+
+      /* ============================================
+   MOBILE SPECIFIC TABLE FIXES
+   ============================================ */
+
+      @media (max-width: 768px) {
+        /* Table wrappers */
+        .table-wrap {
+          margin: 0 -4px 12px -4px;
+          border-radius: var(--r-sm);
+        }
+
+        /* Table cells - smaller padding */
+        table th,
+        table td {
+          padding: 8px 8px;
+          font-size: 12px;
+        }
+
+        /* Table headers - smaller font */
+        thead th {
+          font-size: 9px;
+          padding: 8px 6px;
+        }
+
+        /* Action buttons container */
+        .tbl-actions {
+          display: flex;
+          gap: 4px;
+          flex-wrap: wrap;
+        }
+
+        /* Button sizes on mobile */
+        .tbl-btn {
+          padding: 4px 8px;
+          font-size: 10px;
+        }
+
+        .tbl-btn i {
+          font-size: 9px;
+        }
+
+        /* Stat cards under tables */
+        .stat-grid {
+          gap: 12px;
+        }
+
+        .stat-card {
+          padding: 14px 12px;
+        }
+
+        .stat-val {
+          font-size: 24px;
+        }
+
+        .stat-label {
+          font-size: 10px;
+        }
+
+        /* Member table specific - hide less important columns on very small screens */
+        @media (max-width: 640px) {
+          #membersTable th:nth-child(3),
+          #membersTable td:nth-child(3),
+          #membersTable th:nth-child(4),
+          #membersTable td:nth-child(4) {
+            display: none;
+          }
+        }
+
+        /* Payment table - hide notes column if exists */
+        @media (max-width: 640px) {
+          table th:last-child,
+          table td:last-child {
+            min-width: 80px;
+          }
+        }
+      }
+
+      /* ============================================
+   EXTRA SMALL SCREENS (under 480px)
+   ============================================ */
+
+      @media (max-width: 480px) {
+        .table-wrap {
+          margin: 0 -8px 12px -8px;
+        }
+
+        table th,
+        table td {
+          padding: 6px 5px;
+          font-size: 10px;
+        }
+
+        thead th {
+          font-size: 8px;
+          padding: 6px 4px;
+        }
+
+        .tbl-btn {
+          padding: 3px 5px;
+          font-size: 9px;
+        }
+
+        .tbl-btn i {
+          font-size: 8px;
+        }
+
+        /* Hide additional columns on very small screens for member table */
+        @media (max-width: 480px) {
+          #membersTable th:nth-child(5),
+          #membersTable td:nth-child(5),
+          #membersTable th:nth-child(6),
+          #membersTable td:nth-child(6) {
+            display: none;
+          }
+        }
+      }
+
+      /* ============================================
+   CLASS CARDS RESPONSIVE (if using card view)
+   ============================================ */
+
+      @media (max-width: 1100px) {
+        .trainer-cards,
+        .class-cards {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 640px) {
+        .trainer-cards,
+        .class-cards {
+          grid-template-columns: 1fr;
+        }
+
+        .trainer-card,
+        .class-card {
+          max-width: 100%;
+        }
+
+        .tc-actions,
+        .cc-actions {
+          flex-wrap: wrap;
+        }
+      }
+
+      /* ============================================
+   MODAL RESPONSIVENESS
+   ============================================ */
+
+      @media (max-width: 640px) {
+        .modal {
+          padding: 20px;
+          max-width: 95%;
+        }
+
+        .modal-title {
+          font-size: 20px;
+        }
+
+        .form-row-2 {
+          grid-template-columns: 1fr;
+          gap: 8px;
+        }
+
+        .plan-opts {
+          grid-template-columns: 1fr;
+          gap: 8px;
+        }
+
+        .modal-footer {
+          flex-wrap: wrap;
+        }
+
+        .modal-footer .btn {
+          flex: 1;
+          justify-content: center;
+        }
+
+        /* View member modal on mobile */
+        .vm-grid-2,
+        .vm-grid-3 {
+          grid-template-columns: 1fr;
+          gap: 8px;
+        }
+
+        .vm-top-card {
+          flex-wrap: wrap;
+        }
+
+        .vm-status-wrap {
+          margin-left: 0;
+        }
+      }
+
+      /* ============================================
+   TOOLBAR RESPONSIVE
+   ============================================ */
+
+      @media (max-width: 640px) {
+        .toolbar {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .search-wrap {
+          width: 100%;
+        }
+
+        .filter-select {
+          width: 100%;
+        }
+      }
+
+      /* ============================================
+   SIDEBAR RESPONSIVE (already exists, just ensuring)
+   ============================================ */
+
+      @media (max-width: 900px) {
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.3s var(--ease);
+          z-index: 1000;
+        }
+
+        .sidebar.open {
+          transform: translateX(0);
+        }
+
+        .main-wrap {
+          margin-left: 0;
+        }
+
+        .topbar-menu-toggle {
+          display: block;
+        }
+      }
+
+      /* ============================================
+   PAGE CONTENT RESPONSIVE
+   ============================================ */
+
+      @media (max-width: 768px) {
+        .page {
+          padding: 16px;
+        }
+
+        .page-header-row {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .grid-2 {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+
+        .report-stat-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .page {
+          padding: 12px;
+        }
+
+        .report-stat-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .welcome-strip {
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 20px;
+        }
+
+        .ws-right {
+          width: 100%;
+          justify-content: space-between;
+          flex-wrap: wrap;
+        }
+
+        .ws-quick-btn {
+          min-width: auto;
+          padding: 10px 12px;
+          font-size: 10px;
+        }
+      }
+
+      /* ============================================
+   REVENUE BARS RESPONSIVE
+   ============================================ */
+
+      @media (max-width: 640px) {
+        .donut-wrap {
+          flex-direction: column;
+          align-items: center;
+          gap: 16px;
+        }
+
+        .donut-legend {
+          flex-direction: row;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+      }
+
+      /* ============================================
+   ATTENDANCE MARKING PANEL RESPONSIVE
+   ============================================ */
+
+      @media (max-width: 768px) {
+        .att-date-row {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .att-date-row .inp-wrap {
+          width: 100%;
+        }
+
+        .att-date-row .inp-wrap input {
+          width: 100%;
+        }
+
+        .att-date-row .search-wrap {
+          max-width: 100%;
+        }
+      }
+
+      /* ============================================
+   RECEIPT RESPONSIVE
+   ============================================ */
+
+      @media (max-width: 640px) {
+        .receipt-card {
+          padding: 20px;
+        }
+
+        .receipt-header {
+          flex-direction: column;
+          text-align: center;
+          gap: 8px;
+        }
+
+        .receipt-header > div:last-child {
+          text-align: center;
+        }
+      }
     </style>
   </head>
   <body>
@@ -2176,17 +2605,27 @@
        SIDEBAR
   ═══════════════════════════════════════ -->
       <aside class="sidebar" id="sidebar">
+        <!-- Close button for mobile (at the top) -->
+        <div class="sb-mobile-close">
+          <button id="closeSidebarBtn" class="sb-close-btn">
+            <i class="fa-solid fa-times"></i>
+          </button>
+        </div>
+
+        <!-- Logo section (only once) -->
         <div class="sb-header">
           <a href="index.html" class="sb-logo">
             <div class="sb-logo-mark"><i class="fa-solid fa-dumbbell"></i></div>
             <div class="sb-logo-text">Peak<span>Fit</span></div>
           </a>
-          <div class="sb-admin-badge">
-            <div class="sb-admin-av" id="sbAdminAv">A</div>
-            <div>
-              <div class="sb-admin-name" id="sbAdminName">Administrator</div>
-              <div class="sb-admin-role">System Admin</div>
-            </div>
+        </div>
+
+        <!-- Admin/Trainer/Member Badge -->
+        <div class="sb-admin-badge">
+          <div class="sb-admin-av" id="sbAdminAv">A</div>
+          <div>
+            <div class="sb-admin-name" id="sbAdminName">Administrator</div>
+            <div class="sb-admin-role">System Admin</div>
           </div>
         </div>
 
@@ -4470,6 +4909,39 @@
   → update #mSelectedPlan hidden input
 
 ═══════════════════════════════════════ -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        set,
+        get,
+        child,
+      } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBB9nz1ygjhKc8DzqCkr3I0MH-TTCtOebU",
+        authDomain: "gym-management-system-a06e1.firebaseapp.com",
+        projectId: "gym-management-system-a06e1",
+        storageBucket: "gym-management-system-a06e1.firebasestorage.app",
+        messagingSenderId: "81913907802",
+        appId: "1:81913907802:web:a54cf1624d562013de2663",
+        measurementId: "G-EKYR8GBBV7",
+        databaseURL:
+          "https://gym-management-system-a06e1-default-rtdb.firebaseio.com",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+
+      window.db = db;
+      window.ref = ref;
+      window.set = set;
+      window.get = get;
+      window.child = child;
+
+      console.log("✅ Firebase connected!");
+    </script>
 
     <script src="JS/admin-dashboard.js"></script>
   </body>
